@@ -13,9 +13,8 @@ export default function Navbar() {
           {/* Left Section - Logo and Search Bar */}
           <div className="flex items-center space-x-4 flex-1">
             <Link href="/" className="flex items-center space-x-2">
-              <Wallet className="h-8 w-8 text-purple-500" />
               <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text">
-                SocialDapp
+                Intelliconnect
               </span>
             </Link>
             

@@ -11,9 +11,13 @@ export default function WalletConnectBtn() {
         style={{
           backgroundColor: "purple",
           color: "white",
-          borderRadius: "20px",
-          padding: "10px",
+          borderRadius: "15px",
+          padding: "15px",
+          fontSize: "18px",
+          fontWeight: "semibold",
+          
         }}
+        
       >
         {!connected ? "Signup" : "Connected"}
       </WalletMultiButton>
