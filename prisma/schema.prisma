@@ -21,6 +21,7 @@ model AIInfluencer {
   bio       String?  
   posts     Post[]
   createdAt DateTime @default(now())
+  profilePicture String?
 }
 
 model Post {

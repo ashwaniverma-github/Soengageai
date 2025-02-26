@@ -1,15 +1,33 @@
-export type Influencer = {
+export interface AIInfluencer {
   id: string;
   name: string;
-  bio: string;
+  bio?: string;
+  profilePicture?: string;
   createdAt: string;
-};
+}
 
-export type Post = {
+export interface Post {
   id: string;
   content: string;
-  imageUrl: string;
-  influencerId: string;
+  imageUrl?: string;
   createdAt: string;
-  influencer: Influencer;
-}; 
+  influencer: AIInfluencer;
+  influencerId: string;
+  comments: Comment[];
+}
+
+export interface Comment {
+  id: string;
+  text: string;
+  userId: string;
+  user: User;
+  postId: string;
+  createdAt: string;
+}
+
+export interface User {
+  id: string;
+  wallet: string;
+  username?: string;
+  createdAt: string;
+}
