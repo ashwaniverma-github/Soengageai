@@ -20,7 +20,7 @@ export default function DashboardLayout({
   }, [connected, router]);
 
   return <>
-  <Navbar/>
+  <Navbar bg="bg-black" />
   {children}
   </>;
 }

@@ -9,12 +9,18 @@ export default {
   ],
   theme: {
   	extend: {
+		
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+			'gray-900': '#0a0a0a',
+        'gray-800': '#1f1f1f',
+        'purple-500': '#8b5cf6',
+        'purple-600': '#7c3aed',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
+
   			},
   			popover: {
   				DEFAULT: 'hsl(var(--popover))',

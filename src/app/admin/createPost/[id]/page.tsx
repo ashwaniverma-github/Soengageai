@@ -8,7 +8,7 @@ type Props = {
 };
 
 export default async function CreatePost({ params }: Props) {
-    const influencerId = params.id;
+    const influencerId = await params.id;
   return (
     <div>
       <h1>Create New Post</h1>

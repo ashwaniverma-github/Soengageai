@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 export default function Homepage() {
   return (
     <div className="min-h-screen relative ">
-      <Navbar />
+      <Navbar bg="bg-transparent" />
       
       {/* Background Image */}
       <div className="absolute inset-0 -z-10 h-screen w-scree overflow-hidden p-10">

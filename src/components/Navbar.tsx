@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Home, Wallet, Users, Bell } from 'lucide-react';
 import WalletConnectBtn from '@/sm-components/WalletConnectBtn';
+import { useRouter } from 'next/navigation';
 
-export default function Navbar() {
+export default function Navbar({bg}:{bg:string}) {
+  const router = useRouter()
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md border-b border-transparent">
+    <nav className={`fixed top-0 left-0 right-0 z-50 ${bg} backdrop-blur-md border-b border-transparent`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left Section - Logo and Search Bar */}
@@ -30,7 +32,9 @@ export default function Navbar() {
 
           {/* Center Section - Navigation Items */}
           <div className="flex items-center justify-center space-x-4 mx-8">
-            <Button variant="ghost" className="flex items-center gap-2 text-gray-300 hover:text-white">
+            <Button onClick={()=>{
+              router.push('/')
+            }} variant="ghost" className="flex items-center gap-2 text-gray-300 hover:text-white">
               <Home className="h-5 w-5" />
               <span>Feeds</span>
             </Button>

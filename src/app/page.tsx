@@ -5,20 +5,24 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import HomePage from "@/components/Homepage";
 import Feed from "@/components/Feed";
+
 export default function Home() {
   const { connected } = useWallet();
   const router = useRouter();
 
   useEffect(() => {
-    if (connected) {
+    // Only redirect to dashboard if we're on the homepage
+    if (connected && window.location.pathname === '/') {
       router.push('/dashboard');
     }
-  }, [connected, router]); // Proper dependency array
+  }, [connected, router]);
 
   return (
     <div className="min-h-screen">
       <HomePage/>
-      <Feed/>
+      <div className="bg-slate-900">
+        <Feed/>
+      </div>
     </div>
   );
 }
