@@ -1,47 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Share2, Heart, MessageCircle, Calendar, User, ImageIcon } from "lucide-react";
-
-interface Influencer {
-  id: string;
-  name: string;
-  bio: string;
-  profilePicture: string;
-  createdAt: string;
-  posts: Post[];
-}
-
-interface Post {
-  id: string;
-  content: string;
-  imageUrl: string;
-  createdAt: string;
-}
-
-export default function InfluencerPage({ params }: { params: { id: string } }) {
-  const influencerId = params.id;
-  const [influencer, setInfluencer] = useState<Influencer | null>(null);
+import { Calendar, User, ImageIcon, Heart, MessageCircle } from "lucide-react";
+import ChatWindow from "@/components/ChatWindow";
+import { AIInfluencer , Post } from "@/types/types";
+import { Dialog , DialogContent } from "@/components/ui/dialog";
+export default function InfluencerPage({ params }: { params: Promise<{ id: string }> }) {
+  // Use React.use to unwrap the params Promise
+  const { id: influencerId } = React.use(params);
+  
+  const [influencer, setInfluencer] = useState<AIInfluencer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [chatOpen, setChatOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+
 
   useEffect(() => {
     const fetchInfluencer = async () => {
       try {
         console.log("Fetching influencer with ID:", influencerId);
         const response = await fetch(`/api/influencer/${influencerId}`);
-        
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error("Influencer not found");
           }
           throw new Error("Failed to fetch influencer");
         }
-        
         const data = await response.json();
         setInfluencer(data);
       } catch (err: any) {
@@ -56,39 +45,20 @@ export default function InfluencerPage({ params }: { params: { id: string } }) {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container w-full mx-auto px-4 py-8  bg-zinc-950">
         <div className="animate-pulse space-y-8">
-          {/* Cover Image Skeleton */}
-          <div className="w-full h-40 md:h-64 bg-gray-800 rounded-xl"></div>
-          
-          {/* Profile Header Skeleton */}
-          <div className="flex flex-col md:flex-row gap-6 relative">
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gray-700 border-4 border-gray-900 mx-auto md:mx-0 md:-mt-16"></div>
-            <div className="space-y-4 flex-1 text-center md:text-left">
-              <div className="h-8 w-64 bg-gray-700 rounded mx-auto md:mx-0"></div>
-              <div className="h-4 w-full md:w-3/4 bg-gray-700 rounded mx-auto md:mx-0"></div>
-              <div className="h-4 w-1/2 bg-gray-700 rounded mx-auto md:mx-0"></div>
-              <div className="h-10 w-40 bg-gray-700 rounded mx-auto md:mx-0"></div>
+          <div className="h-40 bg-gray-800/50 rounded-xl"></div>
+          <div className="flex gap-6">
+            <div className="w-28 h-28 rounded-full bg-gray-800/80"></div>
+            <div className="flex-1 space-y-4">
+              <div className="h-8 bg-gray-800/80 rounded w-1/3"></div>
+              <div className="h-4 bg-gray-800/50 rounded w-full"></div>
+              <div className="h-4 bg-gray-800/50 rounded w-2/3"></div>
             </div>
           </div>
-          
-          {/* Stories/Highlights Skeleton */}
-          <div className="flex overflow-x-auto gap-4 py-2 no-scrollbar">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-20 h-20 rounded-full bg-gray-700"></div>
-            ))}
-          </div>
-          
-          {/* Posts Grid Skeleton */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="rounded-xl overflow-hidden bg-gray-800">
-                <div className="aspect-square bg-gray-700"></div>
-                <div className="p-4 space-y-3">
-                  <div className="h-4 bg-gray-700 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-700 rounded w-1/2"></div>
-                </div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-gray-800/30 rounded-xl h-64"></div>
             ))}
           </div>
         </div>
@@ -169,7 +139,7 @@ export default function InfluencerPage({ params }: { params: { id: string } }) {
                 <span className="bg-blue-600/20 text-blue-400 px-2 py-1 rounded-full">Verified</span>
               </div>
             </div>
-            
+          
             <p className="text-gray-300 max-w-2xl">{influencer.bio}</p>
             
             <div className="flex items-center gap-4 text-gray-400 text-sm justify-center md:justify-start">
@@ -184,70 +154,24 @@ export default function InfluencerPage({ params }: { params: { id: string } }) {
             </div>
             
             <div className="flex flex-wrap gap-3 justify-center md:justify-start mt-2">
-              <Link href={`/influencer/${influencer.id}/create-post`}>
-                <Button className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white font-medium">
-                  Create Post
-                </Button>
-              </Link>
-              <Button variant="outline" className="border-gray-700 hover:bg-gray-800">
-                Message
-              </Button>
-              <Button variant="outline" className="border-gray-700 hover:bg-gray-800 px-2 md:px-3">
-                <Share2 size={16} />
+              <Button
+                onClick={() => setChatOpen(true)}
+                className="rounded-full text-white font-semibold bg-purple-600 hover:bg-purple-700"
+              >
+                Chat
               </Button>
             </div>
           </div>
         </div>
         
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-gray-900/50 border-gray-800 backdrop-blur">
-            <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-              <span className="text-2xl font-bold text-purple-400">12.5K</span>
-              <span className="text-sm text-gray-400">Followers</span>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-900/50 border-gray-800 backdrop-blur">
-            <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-              <span className="text-2xl font-bold text-blue-400">845</span>
-              <span className="text-sm text-gray-400">Following</span>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-900/50 border-gray-800 backdrop-blur">
-            <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-              <span className="text-2xl font-bold text-pink-400">62.3K</span>
-              <span className="text-sm text-gray-400">Likes</span>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-900/50 border-gray-800 backdrop-blur">
-            <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-              <span className="text-2xl font-bold text-green-400">89%</span>
-              <span className="text-sm text-gray-400">Engagement</span>
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Content Tabs */}
-        <div className="flex border-b border-gray-800 mb-6 overflow-x-auto no-scrollbar">
-          <button className="px-4 py-3 text-blue-400 border-b-2 border-blue-500 font-medium">
-            Posts
-          </button>
-          <button className="px-4 py-3 text-gray-400 hover:text-gray-300">
-            Videos
-          </button>
-          <button className="px-4 py-3 text-gray-400 hover:text-gray-300">
-            Collections
-          </button>
-          <button className="px-4 py-3 text-gray-400 hover:text-gray-300">
-            About
-          </button>
-        </div>
-
         {/* Posts Grid */}
-        {influencer.posts.length > 0 ? (
+        <div className="mt-8 pb-16">
+          <h2 className="text-xl font-bold text-white mb-4">Posts</h2>
+          
+          {influencer.posts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {influencer.posts.map((post) => (
-              <Card key={post.id} className="bg-gray-900/50 border-gray-800 hover:border-gray-700 transition-all hover:shadow-lg hover:shadow-purple-900/10 overflow-hidden">
+              <Card onClick={()=>{setSelectedPost(post)}} key={post.id} className=" cursor-pointer bg-gray-900/50 border-gray-800 hover:border-gray-700 transition-all hover:shadow-lg hover:shadow-purple-900/10 overflow-hidden">
                 <CardContent className="p-0">
                   <div className="relative aspect-square group">
                     <Image
@@ -271,16 +195,7 @@ export default function InfluencerPage({ params }: { params: { id: string } }) {
                           day: 'numeric' 
                         })}
                       </div>
-                      <div className="flex items-center gap-4">
-                        <button className="text-gray-500 hover:text-red-400 flex items-center gap-1">
-                          <Heart size={16} />
-                          <span className="text-xs">124</span>
-                        </button>
-                        <button className="text-gray-500 hover:text-blue-400 flex items-center gap-1">
-                          <MessageCircle size={16} />
-                          <span className="text-xs">18</span>
-                        </button>
-                      </div>
+                      
                     </div>
                   </div>
                 </CardContent>
@@ -301,7 +216,40 @@ export default function InfluencerPage({ params }: { params: { id: string } }) {
             </Link>
           </div>
         )}
+
+        {/* Expanded Post Modal */}
+            {selectedPost && selectedPost.imageUrl && (
+      <Dialog open onOpenChange={() => setSelectedPost(null)}>
+        <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 bg-transparent border-none">
+          <button
+            onClick={() => setSelectedPost(null)}
+            className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+          >
+            <span className="sr-only">Close</span>
+            ✕
+          </button>
+          <div className="relative w-full h-[90vh]">
+            <Image
+              src={selectedPost.imageUrl}
+              alt="Expanded post image"
+              fill
+              className="object-contain"
+              quality={100}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    )}
+
+        </div>
       </div>
+
+      {/* Chat Modal */}
+      {chatOpen && (
+        <div className="fixed inset-0 z-50 flex items-center rounded-lg justify-center bg-black bg-opacity-75">
+          <ChatWindow influencerId={influencer.name.toLowerCase()} onClose={() => setChatOpen(false)} />
+        </div>
+      )}
     </div>
   );
 }

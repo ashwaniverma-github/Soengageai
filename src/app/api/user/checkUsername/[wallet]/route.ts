@@ -1,23 +1,27 @@
-import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 // This endpoint expects a dynamic route parameter "wallet"
 export async function GET(
-  request: Request,
+  req: NextRequest,
   { params }: { params: { wallet: string } }
 ) {
   try {
-    const { wallet } = params;
+    const wallet = params.wallet;
     const user = await prisma.user.findUnique({
-      where: { wallet },
+      where: { wallet: wallet },
+      select: { username: true }
     });
 
-    // Return the user if found, otherwise return an empty object
-    return NextResponse.json(user || {});
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ username: user.username });
   } catch (error) {
-    console.error("Error fetching user:", error);
+    console.error("Error fetching username:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Failed to fetch username" },
       { status: 500 }
     );
   }

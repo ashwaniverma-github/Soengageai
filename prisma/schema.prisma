@@ -8,20 +8,22 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  wallet    String   @unique
-  username  String?  
-  comments  Comment[]
-  createdAt DateTime @default(now())
+  id            String   @id @default(uuid())
+  wallet        String   @unique
+  username      String?  
+  profilePicture String?  // Add this line
+  comments      Comment[]
+  likes         Like[]
+  createdAt     DateTime @default(now())
 }
 
 model AIInfluencer {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  bio       String?  
-  posts     Post[]
-  createdAt DateTime @default(now())
-  profilePicture String?
+  id              String   @id @default(uuid())
+  name            String   @unique
+  bio             String?  
+  posts           Post[]
+  createdAt       DateTime @default(now())
+  profilePicture  String?
 }
 
 model Post {
@@ -31,6 +33,7 @@ model Post {
   influencer    AIInfluencer @relation(fields: [influencerId], references: [id])
   influencerId  String
   comments      Comment[]
+  likes         Like[]   // New relation: likes on the post
   createdAt     DateTime @default(now())
 }
 
@@ -42,4 +45,15 @@ model Comment {
   post      Post     @relation(fields: [postId], references: [id])
   postId    String
   createdAt DateTime @default(now())
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId]) // ensures a user can like a post only once
 }

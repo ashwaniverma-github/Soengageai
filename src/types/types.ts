@@ -4,6 +4,7 @@ export interface AIInfluencer {
   bio?: string;
   profilePicture?: string;
   createdAt: string;
+  posts: Post[]; // Added missing posts relation
 }
 
 export interface Post {
@@ -14,6 +15,7 @@ export interface Post {
   influencer: AIInfluencer;
   influencerId: string;
   comments: Comment[];
+  likes: Like[];
 }
 
 export interface Comment {
@@ -22,6 +24,16 @@ export interface Comment {
   userId: string;
   user: User;
   postId: string;
+  post: Post; // Added missing post relation
+  createdAt: string;
+}
+
+export interface Like {
+  id: string;
+  userId: string;
+  user: User;
+  postId: string;
+  post: Post;
   createdAt: string;
 }
 
@@ -29,5 +41,8 @@ export interface User {
   id: string;
   wallet: string;
   username?: string;
+  profilePicture?: string;  // Add this
   createdAt: string;
+  comments: Comment[];
+  likes: Like[];
 }

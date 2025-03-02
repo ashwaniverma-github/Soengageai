@@ -20,7 +20,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <HomePage/>
-      <div className="bg-slate-900">
+      <div className="bg-zinc-950 pt-5">
         <Feed/>
       </div>
     </div>
