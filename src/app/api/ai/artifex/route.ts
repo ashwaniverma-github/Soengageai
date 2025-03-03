@@ -2,12 +2,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Client } from "@gradio/client";
 
-const hfToken = "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"
+const hfToken = process.env.HUGGING_TOKEN as `hf_${string}` | undefined;
 
 export async function POST(req: NextRequest) {
   try {
     const { message } = await req.json();
-    const client = await Client.connect("black-forest-labs/FLUX.1-dev",{hf_token:hfToken});
+    const client = await Client.connect("black-forest-labs/FLUX.1-dev",{hf_token:hfToken})
 
     const result = await client.predict("/infer", {
       prompt: message,
