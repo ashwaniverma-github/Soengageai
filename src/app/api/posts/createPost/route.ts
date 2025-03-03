@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const filePath = `posts/${Date.now()}.${fileExt}`;
 
     // Upload file to Supabase Storage
-    const { data, error: uploadError } = await supabase
+    const { error: uploadError } = await supabase
       .storage
       .from("posts")
       .upload(filePath, file);
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true, post }, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
     const errMsg = error && typeof error === "object" && "message" in error ? error.message : "Unknown error";
     console.error("Error in API:", errMsg);
     return NextResponse.json({ error: errMsg || "Internal Server Error" }, { status: 500 });

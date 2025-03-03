@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(user, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error saving username:", error || "Unknown error");
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }

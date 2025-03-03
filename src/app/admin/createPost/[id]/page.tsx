@@ -1,15 +1,18 @@
-// Example usage in a page component
+"use client";
+
+import { use } from "react";
 import CreatePostForm from "@/components/admin/createPost";
 
 type Props = {
-  params: {
-    id: string;
-  };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  params: Promise<{ id: string }>;
+  
 };
 
-export default async function CreatePost({ params }: Props) {
-  const influencerId = await params.id;
+export default function CreatePost({ params }: Props) {
+  // Unwrap both promises
+  const { id: influencerId } = use(params);
+ 
+
   return (
     <div>
       <h1>Create New Post</h1>

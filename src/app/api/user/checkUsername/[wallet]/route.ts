@@ -1,16 +1,17 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-// This endpoint expects a dynamic route parameter "wallet"
 export async function GET(
   req: NextRequest,
-  { params }: { params: { wallet: string } }
+  { params }: { params: Promise<{ wallet: string }> }
 ) {
   try {
-    const wallet = params.wallet;
+    // Unwrap the params Promise
+    const { wallet } = await params;
+
     const user = await prisma.user.findUnique({
-      where: { wallet: wallet },
-      select: { username: true }
+      where: { wallet },
+      select: { username: true },
     });
 
     if (!user) {

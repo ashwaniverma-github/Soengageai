@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Home, Wallet, Users, Bell } from 'lucide-react';
+import { Search, Home,  Users, Bell } from 'lucide-react';
 import WalletConnectBtn from '@/sm-components/WalletConnectBtn';
 import { useRouter } from 'next/navigation';
 

@@ -29,7 +29,7 @@ export default function InfluencerLayout({
     }
 
     return (
-        <div className=" bg-black" >
+        <div className=" bg-black space-y-4" >
             <Navbar bg="bg-black"/>
             {children}
         </div>

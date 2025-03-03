@@ -44,9 +44,13 @@ export default function CreatePostForm({ influencerId }: { influencerId: string 
       // Reset form
       setContent("");
       setFile(null);
-    } catch (err:any) {
-      setError(err.message);
-      console.error("Error creating post:", err);
+    } catch (error) {
+      if(error instanceof Error){
+        setError(error.message);
+      }
+      else{
+        setError("An unknown error occurred");
+      }
     } finally {
       setLoading(false);
     }

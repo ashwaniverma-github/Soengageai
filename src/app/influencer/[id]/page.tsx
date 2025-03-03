@@ -5,20 +5,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, User, ImageIcon, Heart, MessageCircle } from "lucide-react";
+import { Calendar, User, ImageIcon } from "lucide-react";
 import ChatWindow from "@/components/ChatWindow";
-import { AIInfluencer , Post } from "@/types/types";
-import { Dialog , DialogContent } from "@/components/ui/dialog";
+import { AIInfluencer, Post } from "@/types/types";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+
 export default function InfluencerPage({ params }: { params: Promise<{ id: string }> }) {
-  // Use React.use to unwrap the params Promise
+  // Unwrap the params Promise
   const { id: influencerId } = React.use(params);
-  
+
   const [influencer, setInfluencer] = useState<AIInfluencer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-
 
   useEffect(() => {
     const fetchInfluencer = async () => {
@@ -33,8 +33,12 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
         }
         const data = await response.json();
         setInfluencer(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("An unknown error occurred");
+        }
       } finally {
         setLoading(false);
       }
@@ -45,7 +49,7 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
 
   if (loading) {
     return (
-      <div className="container w-full mx-auto px-4 py-8  bg-zinc-950">
+      <div className="container w-full mx-auto px-4 py-8 bg-zinc-950">
         <div className="animate-pulse space-y-8">
           <div className="h-40 bg-gray-800/50 rounded-xl"></div>
           <div className="flex gap-6">
@@ -68,13 +72,13 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
+      <div className="container min-h-screen mx-auto px-4 py-16  text-center">
         <div className="bg-red-900/20 border border-red-500/50 rounded-xl p-8 max-w-md mx-auto">
           <div className="text-red-500 text-4xl mb-4">😕</div>
           <h2 className="text-xl font-bold text-red-400 mb-2">{error}</h2>
-          <p className="text-gray-400 mb-6">We couldn't find what you're looking for.</p>
+          <p className=" text-white mb-6">We couldn&apos;t find what you&apos;re looking for.</p>
           <Link href="/">
-            <Button variant="outline" className="border-red-500/50 hover:bg-red-950/50">
+            <Button variant="outline" className=" text-white border-red-500/50 hover:bg-red-950/50">
               Back to Home
             </Button>
           </Link>
@@ -89,7 +93,7 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
         <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-8 max-w-md mx-auto">
           <div className="text-gray-500 text-4xl mb-4">🔍</div>
           <h2 className="text-xl font-bold text-gray-300 mb-2">Influencer Not Found</h2>
-          <p className="text-gray-400 mb-6">The profile you're looking for doesn't exist or has been removed.</p>
+          <p className="text-gray-400 mb-6">The profile you&apos;re looking for doesn&apos;t exist or has been removed.</p>
           <Link href="/">
             <Button className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600">
               Discover Creators
@@ -106,7 +110,7 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
       <div className="w-full h-40 md:h-64 bg-gradient-to-r from-purple-900/30 to-blue-900/30 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-gray-950 to-transparent opacity-70"></div>
       </div>
-      
+
       <div className="container mx-auto px-4 max-w-6xl relative">
         {/* Profile Section */}
         <div className="flex flex-col md:flex-row gap-6 -mt-12 md:-mt-20 mb-8 relative z-10">
@@ -128,7 +132,7 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
             </div>
             <div className="absolute bottom-0 right-0 w-8 h-8 bg-green-500 rounded-full border-2 border-gray-950"></div>
           </div>
-          
+
           <div className="flex-1 text-center md:text-left space-y-3 mt-2 md:mt-12">
             <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
               <h1 className="text-2xl md:text-3xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
@@ -139,9 +143,9 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
                 <span className="bg-blue-600/20 text-blue-400 px-2 py-1 rounded-full">Verified</span>
               </div>
             </div>
-          
+
             <p className="text-gray-300 max-w-2xl">{influencer.bio}</p>
-            
+
             <div className="flex items-center gap-4 text-gray-400 text-sm justify-center md:justify-start">
               <div className="flex items-center gap-1">
                 <Calendar size={14} />
@@ -152,7 +156,7 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
                 <span>{influencer.posts.length} posts</span>
               </div>
             </div>
-            
+
             <div className="flex flex-wrap gap-3 justify-center md:justify-start mt-2">
               <Button
                 onClick={() => setChatOpen(true)}
@@ -163,91 +167,89 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
             </div>
           </div>
         </div>
-        
+
         {/* Posts Grid */}
         <div className="mt-8 pb-16">
           <h2 className="text-xl font-bold text-white mb-4">Posts</h2>
-          
+
           {influencer.posts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {influencer.posts.map((post) => (
-              <Card onClick={()=>{setSelectedPost(post)}} key={post.id} className=" cursor-pointer bg-gray-900/50 border-gray-800 hover:border-gray-700 transition-all hover:shadow-lg hover:shadow-purple-900/10 overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="relative aspect-square group">
-                    <Image
-                      src={post.imageUrl || "/api/placeholder/400/400"}
-                      alt={post.content.substring(0, 30)}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-950 to-transparent opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
-                    <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <p className="text-white line-clamp-1 text-sm">{post.content}</p>
-                    </div>
-                  </div>
-                  <div className="p-4 space-y-2">
-                    <p className="text-gray-300 line-clamp-2 min-h-[2.5rem]">{post.content}</p>
-                    <div className="flex justify-between items-center pt-2">
-                      <div className="text-xs text-gray-500">
-                        {new Date(post.createdAt).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {influencer.posts.map((post) => (
+                <Card
+                  onClick={() => setSelectedPost(post)}
+                  key={post.id}
+                  className="cursor-pointer bg-gray-900/50 border-gray-800 hover:border-gray-700 transition-all hover:shadow-lg hover:shadow-purple-900/10 overflow-hidden"
+                >
+                  <CardContent className="p-0">
+                    <div className="relative aspect-square group">
+                      <Image
+                        src={post.imageUrl || "/api/placeholder/400/400"}
+                        alt={post.content.substring(0, 30)}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-950 to-transparent opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
+                      <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <p className="text-white line-clamp-1 text-sm">{post.content}</p>
                       </div>
-                      
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center mb-12">
-            <div className="text-gray-500 text-4xl mb-4">📸</div>
-            <h3 className="text-xl font-medium text-gray-300 mb-2">No Posts Yet</h3>
-            <p className="text-gray-400 mb-6 max-w-md mx-auto">
-              {influencer.name} hasn't shared any content yet. Check back later or be the first to create something!
-            </p>
-            <Link href={`/influencer/${influencer.id}/create-post`}>
-              <Button className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600">
-                Create First Post
-              </Button>
-            </Link>
-          </div>
-        )}
+                    <div className="p-4 space-y-2">
+                      <p className="text-gray-300 line-clamp-2 min-h-[2.5rem]">{post.content}</p>
+                      <div className="flex justify-between items-center pt-2">
+                        <div className="text-xs text-gray-500">
+                          {new Date(post.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center mb-12">
+              <div className="text-gray-500 text-4xl mb-4">📸</div>
+              <h3 className="text-xl font-medium text-gray-300 mb-2">No Posts Yet</h3>
+              <p className="text-gray-400 mb-6 max-w-md mx-auto">
+                {influencer.name} hasn&apos;t shared any content yet. Check back later. 
+              </p>
+              
+            </div>
+          )}
 
-        {/* Expanded Post Modal */}
-            {selectedPost && selectedPost.imageUrl && (
-      <Dialog open onOpenChange={() => setSelectedPost(null)}>
-        <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 bg-transparent border-none">
-          <button
-            onClick={() => setSelectedPost(null)}
-            className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-          >
-            <span className="sr-only">Close</span>
-            ✕
-          </button>
-          <div className="relative w-full h-[90vh]">
-            <Image
-              src={selectedPost.imageUrl}
-              alt="Expanded post image"
-              fill
-              className="object-contain"
-              quality={100}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-    )}
-
+          {/* Expanded Post Modal */}
+          {selectedPost && selectedPost.imageUrl && (
+            <Dialog open onOpenChange={() => setSelectedPost(null)}>
+              <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 bg-transparent border-none">
+                <button
+                  onClick={() => setSelectedPost(null)}
+                  className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                >
+                  <span className="sr-only">Close</span>
+                  ✕
+                </button>
+                <div className="relative w-full h-[90vh]">
+                  <Image
+                    src={selectedPost.imageUrl}
+                    alt="Expanded post image"
+                    fill
+                    className="object-contain"
+                    quality={100}
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
 
       {/* Chat Modal */}
       {chatOpen && (
         <div className="fixed inset-0 z-50 flex items-center rounded-lg justify-center bg-black bg-opacity-75">
-          <ChatWindow influencerId={influencer.name.toLowerCase()} onClose={() => setChatOpen(false)} />
+          <ChatWindow influencerName={influencer.name.toLowerCase()} onClose={() => setChatOpen(false)} />
         </div>
       )}
     </div>
