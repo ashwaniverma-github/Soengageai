@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
       randomize_seed: true,
       width: 1024,
       height: 1024,
-    //   guidance_scale: 3.5,
+      guidance_scale: 3.5,
       num_inference_steps: 28,
     });
 
