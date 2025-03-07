@@ -8,11 +8,13 @@ import { Post, AIInfluencer } from "@/types/types";
 import { MoreHorizontal, X } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
+import SignupModal from "@/sm-components/SignupModal";
 
 export default function Feed() {
-  const { setVisible: setWalletModalVisible } = useWalletModal();
+  const [isSignupOpen, setIsSignupOpen] = useState(false);
+  const {data:session} = useSession();
   const { connected, publicKey } = useWallet();
   const [posts, setPosts] = useState<Post[]>([]);
   const [influencers, setInfluencers] = useState<AIInfluencer[]>([]);
@@ -64,8 +66,8 @@ export default function Feed() {
   }, []);
 
   const handleProfileClick = (influencerId: string) => {
-    if (!connected) {
-      setWalletModalVisible(true);
+    if (!connected && !session ) {
+      setIsSignupOpen(true)
     } else {
       window.location.href = `/influencer/${influencerId}`;
     }
@@ -239,7 +241,10 @@ export default function Feed() {
                 <AvatarFallback className="font-bold flex justify-center items-center w-full h-full">
                   {publicKey
                     ? publicKey.toString().slice(0, 2).toUpperCase()
-                    : "US"}
+                    : session?.user?.name
+                    ? session?.user.name.toString().slice(0,2).toUpperCase()
+                    : "US"
+                  }
                 </AvatarFallback>
               </Avatar>
             </div>
@@ -248,7 +253,10 @@ export default function Feed() {
               <p className="text-sm text-zinc-400">
                 {publicKey
                   ? `@${publicKey.toString().slice(0, 4)}...${publicKey.toString().slice(-4)}`
-                  : "Not connected"}
+                  : session?.user?.name
+                  ? session.user.name
+                  :"Not Signed in" 
+                  }
               </p>
             </div>
           </div>
@@ -312,6 +320,7 @@ export default function Feed() {
           )}
         </DialogContent>
       </Dialog>
+      <SignupModal isOpen={isSignupOpen}  onClose={()=>{setIsSignupOpen(false)}} />
     </>
   );
 }

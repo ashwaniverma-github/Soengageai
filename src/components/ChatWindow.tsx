@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { CircleArrowUp } from "lucide-react";
-
+import Image from "next/image";
 interface ChatMessage {
   sender: "user" | "ai";
   text: string;
@@ -146,31 +146,39 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
   };
 
   return (
-    <div className="flex flex-col h-[600px] w-full max-w-2xl bg-gray-900 rounded-2xl shadow-xl overflow-hidden border border-gray-700">
+    <div className="flex flex-col w-full h-full max-h-[600px] sm:max-w-md md:max-w-lg lg:max-w-2xl bg-gray-900 rounded-2xl shadow-xl overflow-hidden border border-gray-700">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-purple-950 text-white">
-        <h2 className="text-xl font-bold">Chat with {influencerName}</h2>
-        <button onClick={onClose} className="p-2 rounded-full transition-colors">
+      <div className="flex items-center justify-between p-3 sm:p-4 bg-purple-950 text-white">
+        <h2 className="text-base sm:text-xl font-bold truncate">Chat with {influencerName}</h2>
+        <button 
+          onClick={onClose} 
+          className="p-1 sm:p-2 rounded-full hover:bg-purple-900 transition-colors"
+        >
           ✕
         </button>
       </div>
 
       {/* Chat History */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900">
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-2 sm:space-y-4 bg-gray-900">
         {messages.map((msg, idx) => (
-          <div key={msg.timestamp || idx} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+          <div 
+            key={msg.timestamp || idx} 
+            className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+          >
             <div
-              className={`max-w-[80%] rounded-2xl p-4 ${
-                msg.sender === "user" ? "bg-purple-800 text-white" : "bg-gray-800 text-gray-100 shadow-md"
+              className={`max-w-[80%] rounded-xl sm:rounded-2xl p-2 sm:p-4 ${
+                msg.sender === "user" 
+                  ? "bg-purple-800 text-white" 
+                  : "bg-gray-800 text-gray-100 shadow-md"
               }`}
             >
-              <div className="break-words">
+              <div className="break-words text-sm sm:text-base">
                 {msg.isLoading ? (
                   <div className="flex items-center justify-center p-2">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-300"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-gray-300"></div>
                   </div>
                 ) : msg.isImage ? (
-                  <img
+                  <Image
                     src={msg.text}
                     alt="Generated content"
                     className="rounded-lg max-w-full h-auto"
@@ -200,7 +208,7 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
       </div>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-gray-700 bg-gray-900">
+      <div className="p-2 sm:p-4 border-t border-gray-700 bg-gray-900">
         <div className="flex gap-2">
           <textarea
             value={input}
@@ -213,15 +221,15 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
                 sendMessage();
               }
             }}
-            className="flex-1 resize-none p-3 rounded-full focus:outline-none bg-gray-800 text-gray-100 placeholder-gray-400 disabled:opacity-50"
+            className="flex-1 resize-none p-2 sm:p-3 rounded-full focus:outline-none bg-gray-800 text-gray-100 placeholder-gray-400 disabled:opacity-50 text-sm sm:text-base"
             rows={1}
           />
           <button
             onClick={sendMessage}
             disabled={!input.trim() || isProcessing}
-            className="p-3 h-auto rounded-full bg-purple-700 hover:bg-purple-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 sm:p-3 h-auto rounded-full bg-purple-700 hover:bg-purple-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <CircleArrowUp className="w-6 h-6 text-gray-100" />
+            <CircleArrowUp className="w-5 h-5 sm:w-6 sm:h-6 text-gray-100" />
           </button>
         </div>
       </div>
