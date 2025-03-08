@@ -11,14 +11,27 @@ model User {
   id             String    @id @default(uuid())
   email          String?   @unique
   wallet         String?   @unique
-  provider       String    // e.g., "google", "wallet", or "both"
-  username       String?  
-  profilePicture String?  
+  provider       String
+  username       String?
+  profilePicture String?
   comments       Comment[]
   likes          Like[]
   createdAt      DateTime  @default(now())
-  subscriptions  Subscription[]
+  credits        Int       @default(0)
+  transactions   Transaction[]
 }
+
+model Transaction {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  orderId    String
+  paymentId  String
+  amount     Int
+  createdAt  DateTime @default(now())
+}
+
+
 
 
 model AIInfluencer {
@@ -62,11 +75,3 @@ model Like {
   @@unique([userId, postId]) // ensures a user can like a post only once
 }
 
-model Subscription {
-  id         String   @id @default(uuid())
-  user       User     @relation(fields: [userId], references: [id])
-  userId     String
-  paymentId  String?  // Optional field to store the payment transaction id
-  amount     Float    // Amount paid for the subscription
-  createdAt  DateTime @default(now())
-}
