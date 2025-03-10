@@ -11,7 +11,6 @@ export default function SubscriptionPage() {
   const [isSignupOpen, setIsSignupOpen] = useState(false);
 
   const handleBuy = (pkg: { credits: number; price: number }) => {
-    // If the user is not signed in via Google or wallet, open the signup modal.
     if (!session && !connected) {
       setIsSignupOpen(true);
       return;
@@ -24,7 +23,6 @@ export default function SubscriptionPage() {
   return (
     <div className="bg-black p-16">
       <Pricing onBuy={handleBuy} />
-      {/* Signup Modal: Shows if the user is not authenticated */}
       <SignupModal isOpen={isSignupOpen} onClose={() => setIsSignupOpen(false)} />
     </div>
   );

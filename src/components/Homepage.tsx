@@ -9,14 +9,14 @@ export default function Homepage() {
       <Navbar bg="bg-transparent" />
       
       {/* Background Image */}
-      <div className="absolute inset-0 -z-10 h-screen w-scree overflow-hidden p-10">
+      <div className="  bg-black absolute inset-0 -z-10 h-screen  overflow-hidden p-1">
         <Image
           src="/BG.png"
           alt="Background"
           fill
           priority
           quality={100}
-          className="object-cover object-center"
+          className="object-cover hidden sm:block object-center"
         />
         <div className="absolute inset-0 bg-black/50 backdrop-blur-xs" />
       </div>
@@ -32,7 +32,6 @@ export default function Homepage() {
           <h1 className="text-2xl sm:text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 mb-6 animate-fade-in-up">
             Socialise With AI Models
           </h1>
-
         </div>
       </main>
     </div>

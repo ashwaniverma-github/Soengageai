@@ -49,7 +49,7 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
 
   if (loading) {
     return (
-      <div className="container w-full mx-auto px-4 py-8 bg-zinc-950">
+      <div className="container min-h-screen w-full mx-auto px-4 py-8 bg-zinc-950">
         <div className="animate-pulse space-y-8">
           <div className="h-40 bg-gray-800/50 rounded-xl"></div>
           <div className="flex gap-6">

@@ -31,9 +31,6 @@ model Transaction {
   createdAt  DateTime @default(now())
 }
 
-
-
-
 model AIInfluencer {
   id              String   @id @default(uuid())
   name            String   @unique

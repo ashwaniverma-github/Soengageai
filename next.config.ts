@@ -8,7 +8,11 @@ const nextConfig = {
         pathname: "/storage/v1/object/public/posts/**",
       },
     ],
-    domains: ['ibbynqmmnxuvjsptcyyq.supabase.co'],
+    domains: [
+      'ibbynqmmnxuvjsptcyyq.supabase.co',
+      'black-forest-labs-flux-1-dev.hf.space',
+      'replicate.delivery'
+    ],
   },
 };
 

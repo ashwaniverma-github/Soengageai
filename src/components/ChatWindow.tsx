@@ -180,6 +180,8 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
                 ) : msg.isImage ? (
                   <Image
                     src={msg.text}
+                    width={600}
+                    height={800}
                     alt="Generated content"
                     className="rounded-lg max-w-full h-auto"
                     onError={(e) => {

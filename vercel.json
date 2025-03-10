@@ -1,0 +1,8 @@
+{
+    "functions": {
+      "api/scheduled/posts/route.ts": {
+        "schedule": "0 * * * *"
+      }
+    }
+  }
+  

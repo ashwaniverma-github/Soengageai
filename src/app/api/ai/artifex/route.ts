@@ -1,36 +1,49 @@
-// app/api/ai/artifex/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { Client } from "@gradio/client";
+import Replicate from "replicate";
 
-const hfToken = process.env.HUGGING_TOKEN as `hf_${string}` | undefined;
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN,
+});
 
 export async function POST(req: NextRequest) {
   try {
     const { message } = await req.json();
-    const client = await Client.connect("black-forest-labs/FLUX.1-dev",{hf_token:hfToken})
-
-    const result = await client.predict("/infer", {
-      prompt: message,
-      seed: 0,
-      randomize_seed: true,
-      width: 1024,
-      height: 1024,
-      guidance_scale: 3.5,
-      num_inference_steps: 28,
+    
+    // Start the prediction
+    const prediction = await replicate.predictions.create({
+      version: "c6b5d2b7459910fec94432e9e1203c3cdce92d6db20f714f1355747990b52fa6",
+      input: {
+        width: 1024,
+        height: 1024,
+        prompt: message,
+        guidance_scale: 5,
+        negative_prompt: "",
+        pag_guidance_scale: 2,
+        num_inference_steps: 18
+      }
     });
 
-    // Extract image URL from Gradio response
-    const imageData = (result.data as { url: string }[])[0];
-    if (!imageData?.url) {
-      throw new Error("Invalid response format from Gradio");
+    // Check prediction status
+    let result = prediction;
+    while (result.status !== "succeeded" && result.status !== "failed") {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      result = await replicate.predictions.get(prediction.id);
     }
 
-    return NextResponse.json({ response: imageData.url });
+    if (result.status === "failed") {
+      throw new Error("Image generation failed");
+    }
+
+    // Get the final output URL
+    const imageUrl = result.output;
+    console.log("Generated Image URL:", imageUrl);
     
-  } catch (error) {
+    return NextResponse.json({ response: imageUrl });
+
+  } catch (error: any) {
     console.error("Error in Artifex endpoint:", error);
     return NextResponse.json(
-      { error: "Failed to generate image" },
+      { error: "Failed to generate image: " + error.message },
       { status: 500 }
     );
   }

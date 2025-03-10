@@ -168,7 +168,7 @@ export default function Feed() {
           {posts.map((post) => (
             <Card
               key={post.id}
-              className="bg-zinc-900 border border-zinc-800 rounded-xl hover:shadow-lg transition-shadow"
+              className="bg-zinc-900 max-w-2xl border border-zinc-800 rounded-xl hover:shadow-lg transition-shadow"
             >
               {/* Post Header */}
               <div className="flex items-center justify-between p-4 border-b border-zinc-800">
@@ -194,9 +194,6 @@ export default function Feed() {
                     </p>
                   </div>
                 </div>
-                <button className="text-zinc-400 hover:text-white p-2 rounded-full">
-                  <MoreHorizontal size={12} />
-                </button>
               </div>
 
               {/* Post Content */}
@@ -206,7 +203,14 @@ export default function Feed() {
                     className="relative w-full rounded-lg overflow-hidden mb-4 cursor-pointer"
                     onClick={() => setSelectedImage(post.imageUrl || '')}
                   >
-                    <div className="relative min-h-[400px] max-h-[800px]">
+                    {/* Responsive image container */}
+                    <div className="relative 
+                      h-[50vh]       // Mobile first height (50% of viewport)
+                      md:h-[50vh]    // Medium screens
+                      lg:h-[60vh]    // Large screens
+                      xl:h-[70vh]    // Extra large screens
+                      max-h-[700px]  // Absolute maximum height
+                    ">
                       <div
                         className="absolute inset-0 bg-zinc-950"
                         style={{ mixBlendMode: "multiply" }}
@@ -216,13 +220,47 @@ export default function Feed() {
                         alt="Post media"
                         fill
                         className="object-contain"
-                        sizes="(max-width: 768px) 100vw, 50vw"
+                        sizes="(max-width: 768px) 100vw, 80vw"
                       />
                     </div>
                   </div>
                 )}
-                <p className="text-zinc-300">{post.content}</p>
-              </CardContent>
+              <div className="space-y-3">
+                {/* Post content rendered with paragraph breaks and formatting */}
+                {post.content.split('\n').map((paragraph, index) => (
+                  <p key={index} className="text-zinc-300 leading-relaxed">
+                    {paragraph}
+                  </p>
+                ))}
+                
+                {/* Hashtags section if the post has any */}
+                {post.content.includes('#') && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {post.content
+                      .split(' ')
+                      .filter(word => word.startsWith('#'))
+                      .map((hashtag, index) => (
+                        <span 
+                          key={index} 
+                          className="text-purple-400 hover:text-purple-300 cursor-pointer text-sm"
+                        >
+                          {hashtag}
+                        </span>
+                      ))}
+                  </div>
+                )}
+                
+                {/* Read more toggle for longer posts */}
+                {post.content.length > 280 && (
+                  <button 
+                    className="text-purple-400 hover:text-purple-300 text-sm font-medium"
+                    onClick={() => {/* Toggle read more state */}}
+                  >
+                    Read more
+                  </button>
+                )}
+              </div>
+            </CardContent>
 
               {/* Post Footer */}
               <CardFooter className="p-4 border-t border-zinc-800">
