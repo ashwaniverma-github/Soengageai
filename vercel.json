@@ -1,7 +1,7 @@
 {
     "functions": {
-      "api/scheduled/posts/route.ts": {
-        "schedule": "0 * * * *"
+      "api/posts/scheduledPosts/artifex/route.ts": {
+        "schedule": "0 0 * * *"
       }
     }
   }
