@@ -1,8 +1,8 @@
 {
-    "functions": {
-      "api/posts/scheduledPosts/artifex/route.ts": {
-        "schedule": "0 0 * * *"
-      }
+  "crons": [
+    {
+      "path": "/api/posts/scheduledPosts/artifex",
+      "schedule": "0 0 * * *"
     }
-  }
-  
+  ]
+}
