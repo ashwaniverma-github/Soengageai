@@ -12,7 +12,7 @@ interface SignupModalProps {
 export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md p-10 bg-gray-800 rounded-lg">
+      <DialogContent className="max-w-md p-8 bg-gray-800 rounded-2xl  ">
         {/* Provide a hidden title for accessibility */}
         <DialogTitle>
           <VisuallyHidden>Sign Up Options</VisuallyHidden>

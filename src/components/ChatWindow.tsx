@@ -1,8 +1,8 @@
 "use client";
-
 import { useState, useEffect, useRef } from "react";
-import { CircleArrowUp } from "lucide-react";
+import { CircleArrowUp, Download } from "lucide-react";
 import Image from "next/image";
+
 interface ChatMessage {
   sender: "user" | "ai";
   text: string;
@@ -47,33 +47,79 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Typing effect implementation
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
-    
-    if (lastMessage?.sender === "ai" && 
-        !lastMessage.isLoading && 
-        !lastMessage.isImage &&
-        lastMessage.displayText.length < lastMessage.text.length) {
+    if (
+      lastMessage?.sender === "ai" &&
+      !lastMessage.isLoading &&
+      !lastMessage.isImage &&
+      lastMessage.displayText.length < lastMessage.text.length
+    ) {
       const timer = setTimeout(() => {
-        setMessages(prev => {
+        setMessages((prev) => {
           const newMessages = [...prev];
           const lastMsg = newMessages[newMessages.length - 1];
           newMessages[newMessages.length - 1] = {
             ...lastMsg,
-            displayText: lastMessage.text.slice(0, lastMsg.displayText.length + 1)
+            displayText: lastMsg.text.slice(0, lastMsg.displayText.length + 1),
           };
           return newMessages;
         });
       }, 20);
-
       return () => clearTimeout(timer);
     }
   }, [messages]);
 
+  // Deduct credits function remains the same
+  const spendCredits = async (amount: number) => {
+    const res = await fetch("/api/user/credits/spend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount }),
+    });
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Failed to deduct credits");
+    }
+    return await res.json();
+  };
+
+  // Update credits function remains the same (could also be passed in from a parent context)
+  const updateCredits = async () => {
+    try {
+      const res = await fetch("/api/user/credits");
+      if (res.ok) {
+        const data = await res.json();
+        console.log("Updated credits:", data.credits);
+        // Optionally update global or local state here.
+      } else {
+        console.error("Failed to update credits.");
+      }
+    } catch (error) {
+      console.error("Error updating credits:", error);
+    }
+  };
+
   const sendMessage = async () => {
     if (!input.trim() || isProcessing) return;
     setIsProcessing(true);
+
+    try {
+      await spendCredits(1);
+    } catch (creditError) {
+      console.error("Credit deduction error:", creditError instanceof Error ? creditError.message : creditError);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: "Insufficient credits. Please purchase more.",
+          displayText: "Insufficient credits. Please purchase more.",
+          timestamp: Date.now().toString(),
+        },
+      ]);
+      setIsProcessing(false);
+      return;
+    }
 
     // Add user message
     const userMessage: ChatMessage = {
@@ -82,55 +128,53 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
       displayText: input,
       timestamp: Date.now().toString(),
     };
-    
-    // Add temporary loading message without valid timestamp
+
+    // Temporary loading message for AI response
     const loadingMessage: ChatMessage = {
       sender: "ai",
       text: "",
       displayText: "",
-      timestamp: "", // Empty timestamp for loader
+      timestamp: Date.now().toString(),
       isLoading: true,
     };
 
-    setMessages(prev => [...prev, userMessage, loadingMessage]);
+    setMessages((prev) => [...prev, userMessage, loadingMessage]);
+    const currentInput = input;
     setInput("");
 
     try {
       const res = await fetch(`/api/ai/${influencerName}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: currentInput }),
       });
-      
-      if (!res.ok) throw new Error('Request failed');
-      
+      if (!res.ok) throw new Error("Request failed");
+
       const data = await res.json();
-      const isImageResponse = influencerName === 'artifex'; // Adjust based on your API
-      
+      const isImageResponse = influencerName === "artifex"; // Adjust as needed
+
       const aiMessage: ChatMessage = {
         sender: "ai",
         text: data.response,
-        displayText: isImageResponse ? "" : "", // Start empty for text responses
-        timestamp: Date.now().toString(), // Valid timestamp only for actual response
+        displayText: isImageResponse ? "" : "", // For text responses, will trigger typing effect
+        timestamp: Date.now().toString(),
         isImage: isImageResponse,
       };
 
-      setMessages(prev => 
-        prev.map(msg => msg.timestamp === loadingMessage.timestamp ? aiMessage : msg)
+      setMessages((prev) =>
+        prev.map((msg) => (msg.isLoading ? aiMessage : msg))
       );
-      
+      await updateCredits();
     } catch (error) {
-      console.error("Error:", error);
-      setMessages(prev => 
-        prev.filter(msg => msg.timestamp !== loadingMessage.timestamp)
-      );
+      console.error("Error sending message:", error);
+      setMessages((prev) => prev.filter((msg) => !msg.isLoading));
       const errorMessage: ChatMessage = {
         sender: "ai",
         text: "Failed to generate response. Please try again.",
         displayText: "Failed to generate response. Please try again.",
         timestamp: Date.now().toString(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsProcessing(false);
     }
@@ -150,8 +194,8 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
       {/* Header */}
       <div className="flex items-center justify-between p-3 sm:p-4 bg-purple-950 text-white">
         <h2 className="text-base sm:text-xl font-bold truncate">Chat with {influencerName}</h2>
-        <button 
-          onClick={onClose} 
+        <button
+          onClick={onClose}
           className="p-1 sm:p-2 rounded-full hover:bg-purple-900 transition-colors"
         >
           ✕
@@ -161,15 +205,13 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
       {/* Chat History */}
       <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-2 sm:space-y-4 bg-gray-900">
         {messages.map((msg, idx) => (
-          <div 
-            key={msg.timestamp || idx} 
+          <div
+            key={msg.timestamp || idx}
             className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
               className={`max-w-[80%] rounded-xl sm:rounded-2xl p-2 sm:p-4 ${
-                msg.sender === "user" 
-                  ? "bg-purple-800 text-white" 
-                  : "bg-gray-800 text-gray-100 shadow-md"
+                msg.sender === "user" ? "bg-purple-800 text-white" : "bg-gray-800 text-gray-100 shadow-md"
               }`}
             >
               <div className="break-words text-sm sm:text-base">
@@ -178,16 +220,27 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
                     <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-gray-300"></div>
                   </div>
                 ) : msg.isImage ? (
-                  <Image
-                    src={msg.text}
-                    width={600}
-                    height={800}
-                    alt="Generated content"
-                    className="rounded-lg max-w-full h-auto"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
+                  <>
+                    <Image
+                      src={msg.text}
+                      width={600}
+                      height={800}
+                      alt="Generated content"
+                      className="rounded-lg max-w-full h-auto"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                    <div className="mt-2">
+                      <a
+                        href={msg.text}
+                        download={`generated-${msg.timestamp}.png`}
+                        className="text-blue-500 underline text-sm"
+                      >
+                        <Download/>
+                      </a>
+                    </div>
+                  </>
                 ) : (
                   <>
                     {formatResponseText(msg.displayText)}
@@ -197,7 +250,6 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
                   </>
                 )}
               </div>
-              {/* Only show timestamp for non-loading messages */}
               {!msg.isLoading && (
                 <p className={`text-xs mt-1 ${msg.sender === "user" ? "text-purple-300" : "text-gray-400"}`}>
                   {formatTimestamp(msg.timestamp)}

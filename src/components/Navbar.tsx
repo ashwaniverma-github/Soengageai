@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Home, Bell, Users, Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 import SignupModal from "@/sm-components/SignupModal";
 import WalletConnectBtn from "@/sm-components/WalletConnectBtn";
 import { useWallet } from "@solana/wallet-adapter-react";
+import NotificationIcon from "@/sm-components/NotificationIcon";
 
+import ProfileModal from "@/sm-components/ProfileModal";
 
 export default function Navbar({ bg }: { bg: string }) {
   const router = useRouter();
@@ -20,7 +22,9 @@ export default function Navbar({ bg }: { bg: string }) {
   const { connected } = useWallet();
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 ${bg} backdrop-blur-md border-b border-transparent`}>
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 ${bg} backdrop-blur-md border-b border-transparent`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left Section */}
@@ -47,7 +51,7 @@ export default function Navbar({ bg }: { bg: string }) {
             </div>
           </div>
 
-          {/* Center Section - Responsive Navigation */}
+          {/* Center Section - Navigation Items */}
           <div className="hidden md:flex flex-1 justify-center">
             <div className="flex items-center space-x-2 lg:space-x-4">
               <Button
@@ -58,13 +62,8 @@ export default function Navbar({ bg }: { bg: string }) {
                 <Home className="h-5 w-5" />
                 <span className="text-sm lg:text-base">Feeds</span>
               </Button>
-              <Button
-                variant="ghost"
-                className="flex items-center gap-1 lg:gap-2 text-gray-300 hover:text-white px-2 lg:px-4"
-              >
-                <Bell className="h-5 w-5" />
-                <span className="text-sm lg:text-base">Notifications</span>
-              </Button>
+              {/* Replace static Notifications button with our dynamic NotificationIcon */}
+              <NotificationIcon />
               <Button
                 variant="ghost"
                 className="flex items-center gap-1 lg:gap-2 text-gray-300 hover:text-white px-2 lg:px-4"
@@ -78,23 +77,17 @@ export default function Navbar({ bg }: { bg: string }) {
           {/* Right Section */}
           <div className="flex items-center justify-end flex-1 md:flex-none">
             <div className="hidden md:flex text-white justify-center items-center mr-4 lg:mr-28">
-              <button className="font-semibold text-sm lg:text-base" onClick={() => router.push('/pricing')}>Pricing</button>
-            </div>
-            {session ? (
+              
               <button
-                onClick={() => signOut()}
-                className="text-sm lg:text-base"
-                style={{
-                  backgroundColor: "purple",
-                  color: "white",
-                  borderRadius: "15px",
-                  padding: "8px 12px",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                }}
+                className="font-semibold text-sm lg:text-base"
+                onClick={() => router.push("/pricing")}
               >
-                Sign Out
+                Pricing
               </button>
+            </div>
+            
+            {session ? (
+              <ProfileModal/>
             ) : connected ? (
               <WalletConnectBtn />
             ) : (
@@ -115,52 +108,53 @@ export default function Navbar({ bg }: { bg: string }) {
             )}
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-16 left-0 right-0 bg-gray-800 border-b border-gray-700">
-            <div className="px-4 py-2 space-y-2">
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-gray-300 hover:text-white"
-                onClick={() => {
-                  router.push('/');
-                  setIsMobileMenuOpen(false);
-                }}
-              >
-                <Home className="h-5 w-5 mr-2" />
-                Feeds
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-gray-300 hover:text-white"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Bell className="h-5 w-5 mr-2" />
-                Notifications
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-gray-300 hover:text-white"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Users className="h-5 w-5 mr-2" />
-                Community
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-gray-300 hover:text-white"
-                onClick={() => {
-                  router.push('/pricing');
-                  setIsMobileMenuOpen(false);
-                }}
-              >
-                Pricing
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden absolute top-16 left-0 right-0 bg-gray-800 border-b border-gray-700">
+          <div className="px-4 py-2 space-y-2">
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-gray-300 hover:text-white"
+              onClick={() => {
+                router.push("/");
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              <Home className="h-5 w-5 mr-2" />
+              Feeds
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-gray-300 hover:text-white"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <Bell className="h-5 w-5 mr-2" />
+              Notifications
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-gray-300 hover:text-white"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <Users className="h-5 w-5 mr-2" />
+              Community
+            </Button>
+              <Button
+              variant="ghost"
+              className="w-full justify-start text-gray-300 hover:text-white"
+              onClick={() => {
+                router.push("/pricing");
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              Pricing
+            </Button>
+          
+          </div>
+        </div>
+      )}
 
       <SignupModal isOpen={isSignupOpen} onClose={() => setIsSignupOpen(false)} />
     </nav>

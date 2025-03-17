@@ -7,6 +7,7 @@ export async function GET() {
             posts: true,
         },
     });
-    console.log(influencers);
+
+
     return NextResponse.json(influencers);
 }

@@ -4,12 +4,15 @@ import axios from "axios";
 import FormData from "form-data";
 
 export async function GET() {
+
+  const url = process.env.ROOT_APP_URL;
   try {
+    
     // 1. Get prompt text from autoPostGenerationText endpoint.
-    const autoTextRes = await fetch("http://localhost:3000/api/ai/autoPostGenerationText", {
+    const autoTextRes = await fetch(`${url}/api/ai/autoPostGenerationText`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "an sketch art of a japanese girl she is wearing a kimono" }),
+      body: JSON.stringify({ message: "Give some high quality creative prompt" }),
     });
     if (!autoTextRes.ok) {
       throw new Error("Failed to get auto post text");
@@ -19,7 +22,7 @@ export async function GET() {
     console.log("Generated prompt", prompt);
 
     // 2. Call /api/ai/artifex with the generated prompt to create an image.
-    const artifexRes = await fetch("http://localhost:3000/api/ai/artifex", {
+    const artifexRes = await fetch(`${url}/api/ai/artifex`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: prompt }),
@@ -63,8 +66,12 @@ export async function GET() {
 
     console.log("Automated post created:", postResponse.data);
     return NextResponse.json({ success: true, post: postResponse.data.post });
-  } catch (error: any) {
-    console.error("Error automating post:", error.message);
-    return NextResponse.json({ error: error.message || "Failed to create post" }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error automating post:", error.message);
+    } else {
+      console.error("Error automating post:", error);
+    }
+    return NextResponse.json({ error: (error as Error).message || "Failed to create post" }, { status: 500 });
   }
 }

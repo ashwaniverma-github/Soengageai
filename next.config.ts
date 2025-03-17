@@ -9,9 +9,10 @@ const nextConfig = {
       },
     ],
     domains: [
-      'ibbynqmmnxuvjsptcyyq.supabase.co',
-      'black-forest-labs-flux-1-dev.hf.space',
-      'replicate.delivery'
+      "ibbynqmmnxuvjsptcyyq.supabase.co",
+      "black-forest-labs-flux-1-dev.hf.space",
+      "replicate.delivery",
+      "lh3.googleusercontent.com",
     ],
   },
 };

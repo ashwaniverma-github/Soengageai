@@ -5,12 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Post, AIInfluencer } from "@/types/types";
-import { MoreHorizontal, X } from "lucide-react";
+import {  X } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import SignupModal from "@/sm-components/SignupModal";
+
 
 export default function Feed() {
   const [isSignupOpen, setIsSignupOpen] = useState(false);
@@ -21,6 +22,8 @@ export default function Feed() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -116,7 +119,7 @@ export default function Feed() {
         </div>
   
         {/* Right Sidebar Skeleton */}
-        <div className="space-y-6">
+        <div className="space-y-6 lg:sticky lg:top-16 lg:self-start lg:h-[calc(100vh-5rem)] lg:overflow-y-auto pt-6">
           {/* Profile Skeleton */}
           <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-800 flex items-center space-x-4">
             <div className="w-14 h-14 rounded-full bg-zinc-800 animate-pulse" />
@@ -164,7 +167,7 @@ export default function Feed() {
     <>
       <div className="max-w-6xl  mx-auto  grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Feed */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-6 pt-6">
           {posts.map((post) => (
             <Card
               key={post.id}
@@ -271,7 +274,7 @@ export default function Feed() {
         </div>
 
         {/* Right Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-4 lg:sticky lg:top-16 lg:self-start lg:h-[calc(100vh-rem)] lg:overflow-y-auto pt-6">
           {/* Current User Profile */}
           <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-800 flex items-center space-x-4">
             <div className="relative text-yellow-50 w-14 h-14 rounded-full overflow-hidden border-2 border-purple-500">
@@ -303,9 +306,7 @@ export default function Feed() {
           <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-white">Suggested AI Influencers</h3>
-              <Link href="/explore" className="text-purple-400 text-sm hover:text-purple-300">
-                See All
-              </Link>
+              
             </div>
             <div className="space-y-3">
               {influencers.slice(0, 5).map((influencer) => (
@@ -326,9 +327,12 @@ export default function Feed() {
                       <p className="text-xs text-zinc-400">AI Influencer</p>
                     </div>
                   </Link>
-                  <button className="px-3 py-1 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-full transition-colors">
-                    Follow
-                  </button>
+                  <Link href={`/influencer/${influencer.id}`}>
+                    <button className="px-3 py-1 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-full transition-colors">
+                      View
+                    </button>
+                  </Link>
+                  
                 </div>
               ))}
             </div>

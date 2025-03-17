@@ -11,6 +11,9 @@
   "dependencies": {
     "@google/generative-ai": "^0.22.0",
     "@headlessui/react": "^2.2.0",
+    "@noble/curves": "^1.8.1",
+    "@noble/ed25519": "^2.2.3",
+    "@noble/hashes": "^1.7.1",
     "@prisma/client": "^5.18.0",
     "@radix-ui/react-avatar": "^1.1.3",
     "@radix-ui/react-dialog": "^1.1.6",
@@ -40,7 +43,8 @@
     "replicate": "^1.0.1",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
-    "tweetnacl": "^1.0.3"
+    "tweetnacl": "^1.0.3",
+    "websocket": "^1.0.35"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

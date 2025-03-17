@@ -10,7 +10,7 @@ export default function WalletConnectBtn() {
     async function saveWallet() {
       if (connected && publicKey) {
         try {
-          const res = await fetch("/api/wallet", {
+          const res = await fetch("/api/auth/wallet", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

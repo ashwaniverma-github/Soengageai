@@ -40,10 +40,10 @@ export async function POST(req: NextRequest) {
     
     return NextResponse.json({ response: imageUrl });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error in Artifex endpoint:", error);
     return NextResponse.json(
-      { error: "Failed to generate image: " + error.message },
+      { error: "Failed to generate image: " + error },
       { status: 500 }
     );
   }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import prisma from "@/lib/prisma";
 
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -54,8 +55,10 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    
+
     return NextResponse.json({ success: true, post }, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
     const errMsg =
       error && typeof error === "object" && "message" in error
         ? error.message
