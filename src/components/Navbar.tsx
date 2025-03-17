@@ -37,7 +37,7 @@ export default function Navbar({ bg }: { bg: string }) {
             </button>
             <Link href="/" className="flex items-center space-x-2">
               <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text">
-                AIConvo
+                Synthverse
               </span>
             </Link>
             {/* Search bar - visible only on lg screens and up */}
