@@ -12,7 +12,7 @@ export async function GET() {
     const autoTextRes = await fetch(`${url}/api/ai/autoPostGenerationText`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "Give some high quality creative prompt" }),
+      body: JSON.stringify({ message: "Give some high quality creative prompt excluding jelly fish" }),
     });
     if (!autoTextRes.ok) {
       throw new Error("Failed to get auto post text");
