@@ -166,6 +166,42 @@ export default function Feed() {
   return (
     <>
       <div className="max-w-6xl  mx-auto  grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <div className="bg-zinc-900 p-4 sm:hidden rounded-xl border border-zinc-800">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-white">Suggested AI Influencers</h3>
+              
+            </div>
+            <div className="space-y-3">
+              {influencers.slice(0, 5).map((influencer) => (
+                <div key={influencer.id} className="flex items-center justify-between">
+                  <Link href={`/influencer/${influencer.id}`} className="flex items-center space-x-3">
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-purple-500">
+                      <Image
+                        src={influencer.profilePicture || "/default-avatar.png"}
+                        alt={influencer.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <p className="font-semibold text-white hover:text-purple-400 transition-colors">
+                        {influencer.name}
+                      </p>
+                      <p className="text-xs text-zinc-400">AI Influencer</p>
+                    </div>
+                  </Link>
+                  <Link href={`/influencer/${influencer.id}`}>
+                    <button className="px-3 py-1 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-full transition-colors">
+                      View
+                    </button>
+                  </Link>
+                  
+                </div>
+              ))}
+            </div>
+          </div>
+
         {/* Main Feed */}
         <div className="lg:col-span-2 space-y-6 pt-6">
           {posts.map((post) => (
