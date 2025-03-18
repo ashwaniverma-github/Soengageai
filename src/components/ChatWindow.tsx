@@ -47,6 +47,7 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Typing effect for AI messages
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
     if (
@@ -70,7 +71,7 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
     }
   }, [messages]);
 
-  // Deduct credits function remains the same
+  // Deduct credits only if influencer is "artifex"
   const spendCredits = async (amount: number) => {
     const res = await fetch("/api/user/credits/spend", {
       method: "POST",
@@ -84,14 +85,14 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
     return await res.json();
   };
 
-  // Update credits function remains the same (could also be passed in from a parent context)
+  // Update credits (could also update global state)
   const updateCredits = async () => {
     try {
       const res = await fetch("/api/user/credits");
       if (res.ok) {
         const data = await res.json();
         console.log("Updated credits:", data.credits);
-        // Optionally update global or local state here.
+        // Optionally update global state here
       } else {
         console.error("Failed to update credits.");
       }
@@ -104,21 +105,24 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
     if (!input.trim() || isProcessing) return;
     setIsProcessing(true);
 
-    try {
-      await spendCredits(1);
-    } catch (creditError) {
-      console.error("Credit deduction error:", creditError instanceof Error ? creditError.message : creditError);
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "ai",
-          text: "Insufficient credits. Please purchase more.",
-          displayText: "Insufficient credits. Please purchase more.",
-          timestamp: Date.now().toString(),
-        },
-      ]);
-      setIsProcessing(false);
-      return;
+    // Deduct credits only for artifex
+    if (influencerName === "artifex") {
+      try {
+        await spendCredits(1);
+      } catch (creditError) {
+        console.error("Credit deduction error:", creditError instanceof Error ? creditError.message : creditError);
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "ai",
+            text: "Insufficient credits. Please purchase more.",
+            displayText: "Insufficient credits. Please purchase more.",
+            timestamp: Date.now().toString(),
+          },
+        ]);
+        setIsProcessing(false);
+        return;
+      }
     }
 
     // Add user message
@@ -129,7 +133,7 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
       timestamp: Date.now().toString(),
     };
 
-    // Temporary loading message for AI response
+    // Add temporary loading message for AI response
     const loadingMessage: ChatMessage = {
       sender: "ai",
       text: "",
@@ -156,7 +160,7 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
       const aiMessage: ChatMessage = {
         sender: "ai",
         text: data.response,
-        displayText: isImageResponse ? "" : "", // For text responses, will trigger typing effect
+        displayText: isImageResponse ? "" : "", // For text responses, trigger typing effect
         timestamp: Date.now().toString(),
         isImage: isImageResponse,
       };
@@ -235,9 +239,10 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
                       <a
                         href={msg.text}
                         download={`generated-${msg.timestamp}.png`}
-                        className="text-blue-500 underline text-sm"
+                        className="text-blue-500 underline text-sm flex items-center gap-1"
                       >
-                        <Download/>
+                        <Download className="w-4 h-4" />
+                        Download
                       </a>
                     </div>
                   </>
