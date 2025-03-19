@@ -104,27 +104,7 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
   const sendMessage = async () => {
     if (!input.trim() || isProcessing) return;
     setIsProcessing(true);
-
-    // Deduct credits only for artifex
-    if (influencerName === "artifex") {
-      try {
-        await spendCredits(1);
-      } catch (creditError) {
-        console.error("Credit deduction error:", creditError instanceof Error ? creditError.message : creditError);
-        setMessages((prev) => [
-          ...prev,
-          {
-            sender: "ai",
-            text: "Insufficient credits. Please purchase more.",
-            displayText: "Insufficient credits. Please purchase more.",
-            timestamp: Date.now().toString(),
-          },
-        ]);
-        setIsProcessing(false);
-        return;
-      }
-    }
-
+  
     // Add user message
     const userMessage: ChatMessage = {
       sender: "user",
@@ -132,7 +112,7 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
       displayText: input,
       timestamp: Date.now().toString(),
     };
-
+  
     // Add temporary loading message for AI response
     const loadingMessage: ChatMessage = {
       sender: "ai",
@@ -141,11 +121,11 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
       timestamp: Date.now().toString(),
       isLoading: true,
     };
-
+  
     setMessages((prev) => [...prev, userMessage, loadingMessage]);
     const currentInput = input;
     setInput("");
-
+  
     try {
       const res = await fetch(`/api/ai/${influencerName}`, {
         method: "POST",
@@ -153,32 +133,47 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
         body: JSON.stringify({ message: currentInput }),
       });
       if (!res.ok) throw new Error("Request failed");
-
+  
       const data = await res.json();
+  
+      // Deduct credits only after successful response for artifex
+      if (influencerName === "artifex") {
+        try {
+          await spendCredits(1);
+        } catch (creditError) {
+          
+          throw new Error("Credit deduction failed - "  + creditError);
+        }
+      }
+  
       const isImageResponse = influencerName === "artifex"; // Adjust as needed
-
       const aiMessage: ChatMessage = {
         sender: "ai",
         text: data.response,
-        displayText: isImageResponse ? "" : "", // For text responses, trigger typing effect
+        displayText: isImageResponse ? "" : "", 
         timestamp: Date.now().toString(),
         isImage: isImageResponse,
       };
-
+  
       setMessages((prev) =>
         prev.map((msg) => (msg.isLoading ? aiMessage : msg))
       );
       await updateCredits();
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error("Error:", error instanceof Error ? error.message : error);
       setMessages((prev) => prev.filter((msg) => !msg.isLoading));
+      
       const errorMessage: ChatMessage = {
         sender: "ai",
-        text: "Failed to generate response. Please try again.",
-        displayText: "Failed to generate response. Please try again.",
+        text: error instanceof Error ? error.message : "Request failed",
+        displayText: error instanceof Error ? error.message : "Request failed",
         timestamp: Date.now().toString(),
       };
-      setMessages((prev) => [...prev, errorMessage]);
+      
+      // Only show credit-related error if it's a credit issue
+      if (error instanceof Error && error.message.includes("Credit")) {
+        setMessages((prev) => [...prev, errorMessage]);
+      }
     } finally {
       setIsProcessing(false);
     }
