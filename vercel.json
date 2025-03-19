@@ -2,7 +2,7 @@
   "functions": {
     "api/ai/artifex/route": {
       "memory": 1024,
-      "maxDuration": 60
+      "maxDuration":60
     }
   }
 }
