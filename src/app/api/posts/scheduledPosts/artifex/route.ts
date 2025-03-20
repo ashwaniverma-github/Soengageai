@@ -1,9 +1,15 @@
 // src/app/api/scheduled/posts/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import FormData from "form-data";
 
-export async function GET() {
+export async function GET(req:NextRequest) {
+
+  const secret = req.headers.get("x-internal-secret")
+
+  if(secret!== process.env.ADMIN_SECRET){
+    return NextResponse.json({error:"unauthorized"} , {status:401} )
+  }
 
   const url = process.env.ROOT_APP_URL;
   try {
