@@ -137,7 +137,7 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
       const data = await res.json();
   
       // Deduct credits only after successful response for artifex
-      if (influencerName === "artifex") {
+      if (influencerName === "artifex" && res.ok) {
         try {
           await spendCredits(1);
         } catch (creditError) {
