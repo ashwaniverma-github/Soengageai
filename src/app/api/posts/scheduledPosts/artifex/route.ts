@@ -10,7 +10,6 @@ export async function GET(req:NextRequest) {
   if(secret!== process.env.ADMIN_SECRET){
     return NextResponse.json({error:"unauthorized"} , {status:401} )
   }
-
   const url = process.env.ROOT_APP_URL;
   try {
     
