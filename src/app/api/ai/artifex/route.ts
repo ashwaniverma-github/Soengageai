@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Replicate from "replicate";
 
+// Force serverless runtime to allow longer execution times
+export const runtime = "nodejs";
+
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
@@ -19,11 +22,11 @@ export async function POST(req: NextRequest) {
         guidance_scale: 5,
         negative_prompt: "",
         pag_guidance_scale: 2,
-        num_inference_steps: 18
-      }
+        num_inference_steps: 18,
+      },
     });
 
-    // Check prediction status
+    // Poll the prediction status until it's complete or failed
     let result = prediction;
     while (result.status !== "succeeded" && result.status !== "failed") {
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -34,16 +37,19 @@ export async function POST(req: NextRequest) {
       throw new Error("Image generation failed");
     }
 
-    // Get the final output URL
+    // Extract the final output URL (assuming result.output is a URL or an array of URLs)
     const imageUrl = result.output;
     console.log("Generated Image URL:", imageUrl);
     
     return NextResponse.json({ response: imageUrl });
-
   } catch (error) {
-    console.error("Error in Artifex endpoint:", error);
+    if (error instanceof Error) {
+      console.error("Error in Artifex endpoint:", error.message);
+    } else {
+      console.error("Error in Artifex endpoint:", error);
+    }
     return NextResponse.json(
-      { error: "Failed to generate image: " + error },
+      { error: "Failed to generate image: " + (error instanceof Error ? error.message : String(error)) },
       { status: 500 }
     );
   }
