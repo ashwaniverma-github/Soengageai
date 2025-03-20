@@ -14,22 +14,23 @@ export async function POST(req: NextRequest) {
     
     // Start the prediction
     const prediction = await replicate.predictions.create({
-      version: "c6b5d2b7459910fec94432e9e1203c3cdce92d6db20f714f1355747990b52fa6",
+      model: "black-forest-labs/flux-schnell",
       input: {
-        width: 1024,
-        height: 1024,
         prompt: message,
-        guidance_scale: 5,
-        negative_prompt: "",
-        pag_guidance_scale: 2,
-        num_inference_steps: 18,
+        go_fast: true,
+        megapixels: "1",
+        num_outputs: 1,
+        aspect_ratio: "1:1",
+        output_format: "webp",
+        output_quality: 80,
+        num_inference_steps: 4,
       },
     });
 
     // Poll the prediction status until it's complete or failed
     let result = prediction;
     while (result.status !== "succeeded" && result.status !== "failed") {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       result = await replicate.predictions.get(prediction.id);
     }
 
@@ -37,16 +38,18 @@ export async function POST(req: NextRequest) {
       throw new Error("Image generation failed");
     }
 
-    // Extract the final output URL (assuming result.output is a URL or an array of URLs)
-    const imageUrl = result.output;
+    // Extract the output URL (assuming result.output is a URL or an array of URLs)
+    const imageUrl = Array.isArray(result.output) ? result.output[0] : result.output;
     console.log("Generated Image URL:", imageUrl);
+
+    // In your API route
+    return NextResponse.json({ response: imageUrl })
     
-    return NextResponse.json({ response: imageUrl });
   } catch (error) {
     if (error instanceof Error) {
       console.error("Error in Artifex endpoint:", error.message);
     } else {
-      console.error("Error in Artifex endpoint:", error);
+      console.error("Error in Artifex endpoint:", String(error));
     }
     return NextResponse.json(
       { error: "Failed to generate image: " + (error instanceof Error ? error.message : String(error)) },
