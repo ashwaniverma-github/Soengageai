@@ -12,24 +12,24 @@ export default function CreatePostForm({ influencerId }: { influencerId: string 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!file) {
-      setError("Please select an image");
-      return;
-    }
 
     setLoading(true);
     setError("");
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      if (file) {
+        formData.append("file", file);
+      }
       formData.append("content", content);
       formData.append("influencerId", influencerId);
 
       const response = await fetch("/api/posts/createPost", {
         method: "POST",
         body: formData,
+        headers: {
+          "x-internal-secret": process.env.NEXT_PUBLIC_INTERNAL_SECRET || "",
+        },
       });
 
       if (!response.ok) {
@@ -40,15 +40,14 @@ export default function CreatePostForm({ influencerId }: { influencerId: string 
       // Redirect or refresh posts
       router.refresh();
       alert("Post created successfully!");
-      
+
       // Reset form
       setContent("");
       setFile(null);
     } catch (error) {
-      if(error instanceof Error){
+      if (error instanceof Error) {
         setError(error.message);
-      }
-      else{
+      } else {
         setError("An unknown error occurred");
       }
     } finally {
@@ -59,7 +58,7 @@ export default function CreatePostForm({ influencerId }: { influencerId: string 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-gray-900 rounded-lg">
       <h2 className="text-xl font-semibold mb-4">Create New Post</h2>
-      
+
       {error && (
         <div className="mb-4 p-3 bg-red-600 text-white rounded">
           {error}
@@ -78,14 +77,13 @@ export default function CreatePostForm({ influencerId }: { influencerId: string 
 
         <div>
           <label className="block mb-2 text-sm font-medium text-gray-300">
-            Upload Image
+            Upload Image (optional)
           </label>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setFile(e.target.files?.[0] || null)}
             className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
-            required
           />
         </div>
 
