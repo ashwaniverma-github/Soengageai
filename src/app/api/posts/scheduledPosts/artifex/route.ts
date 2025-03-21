@@ -10,11 +10,11 @@ export async function GET(req:NextRequest) {
   if(secret!== process.env.ADMIN_SECRET){
     return NextResponse.json({error:"unauthorized"} , {status:401} )
   }
-  const url = process.env.ROOT_APP_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   try {
     
     // 1. Get prompt text from autoPostGenerationText endpoint.
-    const autoTextRes = await fetch(`${url}/api/ai/autoPostGenerationText`, {
+    const autoTextRes = await fetch(`${baseUrl}/api/ai/autoPostGenerationText`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: "Give me a  high quality creative prompt for generating a image , give only one prompt 20-30 words" }),
@@ -27,7 +27,7 @@ export async function GET(req:NextRequest) {
     console.log("Generated prompt", prompt);
 
     // 2. Call /api/ai/artifex with the generated prompt to create an image.
-    const artifexRes = await fetch(`${url}/api/ai/artifex`, {
+    const artifexRes = await fetch(`${baseUrl}/api/ai/artifex`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: prompt }),
@@ -56,9 +56,6 @@ export async function GET(req:NextRequest) {
     // Hardcode influencerId for now (replace with dynamic selection if needed)
     const influencerId = "3dd2cfff-d524-469d-bea4-3634df18dee4";
     formData.append("influencerId", influencerId);
-
-    // 5. Determine the base URL for the request.
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
     // Send POST request to your posts creation endpoint using the absolute URL.
     const postResponse = await axios.post(`${baseUrl}/api/posts/createPost`, formData, {

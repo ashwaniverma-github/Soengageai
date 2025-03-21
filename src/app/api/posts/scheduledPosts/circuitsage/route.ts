@@ -10,10 +10,10 @@ export async function GET(req:NextRequest) {
   if(secret!== process.env.ADMIN_SECRET) {
     return NextResponse.json({error:"unauthorized"} , {status:401} )
   }
-  const url = process.env.ROOT_APP_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
   try {
     
-    const autoTextRes = await fetch(`${url}/api/ai/autoPostGenerationText`, {
+    const autoTextRes = await fetch(`${baseUrl}/api/ai/autoPostGenerationText`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: "Give me a fun fact about tech" }),
@@ -33,7 +33,7 @@ export async function GET(req:NextRequest) {
     formData.append("influencerId", influencerId);
 
     // 5. Determine the base URL for the request.
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    
 
     // Send POST request to your posts creation endpoint using the absolute URL.
     const postResponse = await axios.post(`${baseUrl}/api/posts/createPost`, formData, {
