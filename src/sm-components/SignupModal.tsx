@@ -18,7 +18,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
           <VisuallyHidden>Sign Up Options</VisuallyHidden>
         </DialogTitle>
         <h2 className="text-2xl font-bold text-white mb-6 text-center">
-          Welcome to AIConvo
+          Welcome to Soengageai
         </h2>
         <div className="flex flex-col gap-4 ">
           {/* Option 1: Continue with Google */}
