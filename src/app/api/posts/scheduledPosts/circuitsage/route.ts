@@ -13,11 +13,10 @@ export async function GET(req:NextRequest) {
   const url = process.env.ROOT_APP_URL;
   try {
     
-    // 1. Get prompt text from autoPostGenerationText endpoint.
     const autoTextRes = await fetch(`${url}/api/ai/autoPostGenerationText`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "Give me a  high quality creative prompt for generating a image , give only one prompt 20-30 words" }),
+      body: JSON.stringify({ message: "Give me a fun fact about tech" }),
     });
     if (!autoTextRes.ok) {
       throw new Error("Failed to get auto post text");
@@ -26,35 +25,11 @@ export async function GET(req:NextRequest) {
     const prompt = autoTextData.response || "Default prompt";
     console.log("Generated prompt", prompt);
 
-    // 2. Call /api/ai/artifex with the generated prompt to create an image.
-    const artifexRes = await fetch(`${url}/api/ai/artifex`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: prompt }),
-    });
-    if (!artifexRes.ok) {
-      throw new Error("Failed to generate image from Artifex");
-    }
-    const artifexData = await artifexRes.json();
-    // Assuming artifexData.response is a URL to the generated image (e.g., a .webp or .png file)
-    const imageUrl = artifexData.response;
-    if (!imageUrl) {
-      throw new Error("Image URL not received from Artifex");
-    }
-
-    // 3. Download the image from imageUrl as a stream using axios.
-    const imageResponse = await axios.get(imageUrl, { responseType: "stream" });
-    const fileStream = imageResponse.data; // This is the readable stream
-
-    // 4. Prepare form data to create a new post.
     const formData = new FormData();
-    // Append the image stream with a filename
-    formData.append("file", fileStream, { filename: "generated-image.webp" });
-    // Generate post content text (e.g., using the prompt or current time)
     const content = prompt;
     formData.append("content", content);
-    // Hardcode influencerId for now (replace with dynamic selection if needed)
-    const influencerId = "3dd2cfff-d524-469d-bea4-3634df18dee4";
+
+    const influencerId = "26462708-0128-42b7-beb8-b38c4c8efac6";
     formData.append("influencerId", influencerId);
 
     // 5. Determine the base URL for the request.

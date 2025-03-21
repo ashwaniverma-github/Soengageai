@@ -9,6 +9,7 @@ import { Calendar, User, ImageIcon } from "lucide-react";
 import ChatWindow from "@/components/ChatWindow";
 import { AIInfluencer, Post } from "@/types/types";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import PostContentOnly from "@/sm-components/PostContentOnly";
 
 export default function InfluencerPage({ params }: { params: Promise<{ id: string }> }) {
   // Unwrap the params Promise
@@ -183,15 +184,19 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
                     key={post.id}
                     className="cursor-pointer bg-gray-900/50 border-gray-800 hover:border-gray-700 transition-all hover:shadow-lg hover:shadow-purple-900/10 overflow-hidden"
                   >
-                    <CardContent className="p-0">
-                      <div className="relative aspect-square group">
-                        <Image
-                          src={post.imageUrl || "/api/placeholder/400/400"}
-                          alt={post.content.substring(0, 30)}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          sizes="(max-width: 640px) 33vw, (max-width: 1024px) 33vw, 33vw"
-                        />
+                    <CardContent className="p-0 ">
+                      <div className="relative aspect-square group ">
+                        {post.imageUrl ? (
+                          <Image
+                            src={post.imageUrl}
+                            alt={post.content.substring(0, 30)}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                            sizes="(max-width: 640px) 33vw, (max-width: 1024px) 33vw, 33vw"
+                          />
+                        ) : (
+                          <PostContentOnly content={post.content} />
+                        )}
                         <div className="absolute inset-0 bg-gradient-to-t from-gray-950 to-transparent opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
                       </div>
                       <div className="p-2 md:p-4 space-y-1 md:space-y-2">

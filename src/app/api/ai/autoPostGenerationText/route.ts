@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Add system instruction to the prompt
-    const systemInstruction = "You are an AI model specialized in generating creative and high-quality image prompt. Just Give a 15-20 words prompt . you should give only one prompt at a time."
+    const systemInstruction = ""
     const fullPrompt = systemInstruction + message;
 
     const result = await model.generateContent(fullPrompt);
