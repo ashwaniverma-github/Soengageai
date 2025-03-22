@@ -39,7 +39,7 @@ export async function GET(req:NextRequest) {
     const postResponse = await axios.post(`${baseUrl}/api/posts/createPost`, formData, {
       headers: {
         ...formData.getHeaders(),
-        "x-internal-secret": process.env.NEXT_PUBLIC_INTERNAL_SECRET,
+        "x-internal-secret": process.env.INTERNAL_SECRET,
       },
     });
     

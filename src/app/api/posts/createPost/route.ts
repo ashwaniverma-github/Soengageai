@@ -10,7 +10,7 @@ const supabase = createClient(
 export async function POST(req: NextRequest) {
   // Check if request contains internal secret header
   const internalSecret = req.headers.get("x-internal-secret");
-  if (internalSecret !== process.env.NEXT_PUBLIC_INTERNAL_SECRET) {
+  if (internalSecret !== process.env.INTERNAL_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
   
