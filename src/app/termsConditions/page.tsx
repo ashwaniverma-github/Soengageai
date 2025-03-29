@@ -1,6 +1,9 @@
+import BackButton from "@/sm-components/BackButton"
+
 export default function TermsConditions() {
   return (
     <div className="bg-gray-100 text-black p-6 font-sans">
+      <BackButton/>
       <div className="max-w-4xl mx-auto">
         <h4 className="text-xl font-bold mb-4">Welcome to soengageai.com!</h4>
         <p className="mb-4">

@@ -1,6 +1,9 @@
+import BackButton from "@/sm-components/BackButton";
+
 export default function ContactUs() {
   return (
     <div className="bg-gray-100 text-black p-6 font-sans">
+        <BackButton/>
       <h1 className="text-center text-2xl font-bold mb-4">Contact Us</h1>
       <h2 className="text-center text-lg mb-6">
         Wanna connect with us? <br />

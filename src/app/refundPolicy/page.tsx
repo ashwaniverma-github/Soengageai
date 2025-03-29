@@ -1,6 +1,9 @@
+import BackButton from "@/sm-components/BackButton"
+
 export default function RefundPolicy() {
   return (
     <div className="bg-gray-100 text-black p-6 font-sans">
+        <BackButton/>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">Refund Policy</h1>
         <p className="mb-4 text-gray-600">Last Updated: [28/03/2025]</p>
