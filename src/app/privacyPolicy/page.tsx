@@ -31,12 +31,12 @@ export default function PrivacyPolicy() {
           </li>
           <li>
             <strong>Affiliate:</strong> An entity that controls, is controlled by, or is under
-            common control with a party, where "control" means ownership of 50% or more of the
+            common control with a party, where &quot;control&quot; means ownership of 50% or more of the
             shares, equity interest, or other securities entitled to vote for election of directors
             or other managing authority.
           </li>
           <li>
-            <strong>Company:</strong> (referred to as either "the Company", "We", "Us" or "Our" in
+            <strong>Company:</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in
             this Agreement) refers to Soengageai.
           </li>
           <li>
@@ -104,7 +104,7 @@ export default function PrivacyPolicy() {
         <h4 className="text-md font-semibold mb-2">Usage Data</h4>
         <p className="mb-4">
           Usage Data is collected automatically when using the Service. Usage Data may include
-          information such as Your Device's Internet Protocol address (e.g. IP address), browser
+          information such as Your Device&apos;s Internet Protocol address (e.g. IP address), browser
           type, browser version, the pages of our Service that You visit, the time and date of Your
           visit, the time spent on those pages, unique device identifiers, and other diagnostic
           data.
