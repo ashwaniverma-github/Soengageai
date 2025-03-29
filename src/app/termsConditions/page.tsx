@@ -4,21 +4,21 @@ export default function TermsConditions() {
       <div className="max-w-4xl mx-auto">
         <h4 className="text-xl font-bold mb-4">Welcome to soengageai.com!</h4>
         <p className="mb-4">
-          These terms and conditions outline the rules and regulations for the use of soengageai.com's Website, located at soengageai@gmail.com.
+          These terms and conditions outline the rules and regulations for the use of soengageai.com&apos;s Website, located at soengageai@gmail.com.
         </p>
         <p className="mb-4">
           By accessing this website, we assume you accept these terms and conditions. Do not continue to use soengageai.com if you do not agree to take all of the terms and conditions stated on this page.
         </p>
         <p className="mb-4">
-          The following terminology applies to these Terms and Conditions, Privacy Statement, and Disclaimer Notice and all Agreements: "Client", "You" and "Your" refers to you, the person logging on to this website and compliant with the Company’s terms and conditions. "The Company", "Ourselves", "We", "Our" and "Us", refers to our Company. "Party", "Parties", or "Us", refers to both the Client and ourselves. All terms refer to the offer, acceptance, and consideration of payment necessary to undertake the process of our assistance to the Client in the most appropriate manner for the express purpose of meeting the Client’s needs in respect of the provision of the Company’s stated services, in accordance with and subject to, prevailing law of Netherlands. Any use of the above terminology or other words in the singular, plural, capitalization, and/or he/she or they, are taken as interchangeable and therefore as referring to the same.
+          The following terminology applies to these Terms and Conditions, Privacy Statement, and Disclaimer Notice and all Agreements: &quot;Client&quot;, &quot;You&quot; and &quot;Your&quot; refers to you, the person logging on to this website and compliant with the Company&apos;s terms and conditions. &quot;The Company&quot;, &quot;Ourselves&quot;, &quot;We&quot;, &quot;Our&quot; and &quot;Us&quot;, refers to our Company. &quot;Party&quot;, &quot;Parties&quot;, or &quot;Us&quot;, refers to both the Client and ourselves. All terms refer to the offer, acceptance, and consideration of payment necessary to undertake the process of our assistance to the Client in the most appropriate manner for the express purpose of meeting the Client&apos;s needs in respect of the provision of the Company&apos;s stated services, in accordance with and subject to, prevailing law of Netherlands. Any use of the above terminology or other words in the singular, plural, capitalization, and/or he/she or they, are taken as interchangeable and therefore as referring to the same.
         </p>
 
         <h3 className="text-lg font-semibold mb-2">Cookies</h3>
         <p className="mb-4">
-          We employ the use of cookies. By accessing soengageai.com, you agreed to use cookies in agreement with soengageai.com's Privacy Policy.
+          We employ the use of cookies. By accessing soengageai.com, you agreed to use cookies in agreement with soengageai.com&apos;s Privacy Policy.
         </p>
         <p className="mb-4">
-          Most interactive websites use cookies to let us retrieve the user’s details for each visit. Cookies are used by our website to enable the functionality of certain areas to make it easier for people visiting our website. Some of our affiliate/advertising partners may also use cookies.
+          Most interactive websites use cookies to let us retrieve the user&apos;s details for each visit. Cookies are used by our website to enable the functionality of certain areas to make it easier for people visiting our website. Some of our affiliate/advertising partners may also use cookies.
         </p>
 
         <h3 className="text-lg font-semibold mb-2">License</h3>
