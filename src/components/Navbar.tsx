@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Home, Bell, Users, Menu, X } from "lucide-react";
+import { Search, Home, Bell, Users, Menu, X, Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
@@ -35,7 +35,12 @@ export default function Navbar({ bg }: { bg: string }) {
             >
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-1">
+              <img
+                src="favicon.ico"
+                alt="Logo"
+                className="h-8 w-8 object-contain" // Adjusted size and alignment
+              />
               <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text">
                 Soengageai
               </span>
