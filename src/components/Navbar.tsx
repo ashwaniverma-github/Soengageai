@@ -37,7 +37,7 @@ export default function Navbar({ bg }: { bg: string }) {
             </button>
             <Link href="/" className="flex items-center space-x-1">
               <img
-                src="favicon.ico"
+                src="/favicon.ico"
                 alt="Logo"
                 className="h-8 w-8 object-contain" // Adjusted size and alignment
               />
