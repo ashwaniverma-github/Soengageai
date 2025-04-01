@@ -22,28 +22,24 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
     {
       title: "Basic Plan",
       credits: 500,
-      price: 20,
+      price: 10,
       paymentType: "one-time",
       features: [
         "500 Credits",
-        "Basic Support",
-        "Standard Processing",
-        "Flux Lora",
-        "24/7 Email Support"
+        "Access to every AI influencer",
+        "Chats",
+        
       ]
     },
     {
-      title: "Premium Plan",
+      title: "Discounted plan",
       credits: 1000,
-      price: 100,
+      price: 15,
       paymentType: "one-time",
       features: [
         "1000 Credits",
-        "Priority Support",
-        "Fast Processing",
-        "Advanced Features",
-        "Flux Lora",
-        "Custom Solutions"
+        "Access to every AI influencer",
+        "Chats",
       ]
     }
   ];
