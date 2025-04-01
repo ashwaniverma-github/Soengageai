@@ -1,7 +1,9 @@
-import type { NextAuthOptions, Session } from "next-auth";
-import type { Account, User as NextAuthUser } from "next-auth";
+// auth.ts
+import type { NextAuthOptions, Session, User } from "next-auth";
+import type { Account, Profile } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import prisma from "@/lib/prisma";
+import { JWT } from "next-auth/jwt";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -14,45 +16,90 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async session({ session, token }): Promise<Session> {
-      if (session?.user) {
-        session.user.id = token.sub as string;
+    async jwt({ token, user, account }: { 
+      token: JWT;
+      user?: User;
+      account?: Account | null;
+      profile?: Profile;
+    }) {
+      // Initial sign-in: get user from DB and add ID to token
+      if (user && account?.provider) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email! },
+        });
+
+        if (dbUser) {
+          token.sub = dbUser.id; // Set JWT sub to database ID
+          token.email = dbUser.email ?? undefined;
+        }
+      }
+      return token;
+    },
+
+    async session({ session, token }: { session: Session; token: JWT }) {
+      if (session.user) {
+        // Add database ID to session
+        session.user.id = token.sub!;
+        session.user.email = token.email!;
       }
       return session;
     },
-    async signIn({
-      user,
-      account,
-    }: {
-      user: NextAuthUser;
+
+    async signIn({ user, account, profile }: { 
+      user: User;
       account: Account | null;
-    }): Promise<boolean> {
-      if (account?.provider === "google") {
-        const email = user.email ?? "";
-        const profile = user.image ?? "";
+      profile?: Profile;
+    }) {
+      try {
+        if (account?.provider === "google") {
+          if (!user.email) throw new Error("No email provided");
 
-        if (!email) {
-          return false;
-        }
-
-        const userDb = await prisma.user.findFirst({
-          where: { email },
-        });
-
-        if (!userDb) {
-          const defaultUsername = email.split("@")[0];
-          await prisma.user.create({
-            data: {
-              email,
-              username: defaultUsername,
-              profilePicture: profile,
+          // Upsert user in database
+          const dbUser = await prisma.user.upsert({
+            where: { email: user.email },
+            update: {
+              profilePicture: user.image || profile?.image,
+            },
+            create: {
+              email: user.email,
+              username: user.email.split("@")[0],
+              profilePicture: user.image || profile?.image,
               provider: "Google",
             },
           });
+
+          // Attach database ID to user object
+          user.id = dbUser.id;
         }
+        return true;
+      } catch (error) {
+        console.error("SignIn error:", error);
+        return false;
       }
-      return true;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
+
+// next-auth.d.ts
+// import { DefaultSession } from "next-auth";
+
+// declare module "next-auth" {
+//   interface Session {
+//     user: {
+//       id: string;
+//       email: string;
+//     } & DefaultSession["user"];
+//   }
+
+//   interface User {
+//     id?: string;
+//   }
+// }
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id?: string;
+    email?: string;
+  }
+}

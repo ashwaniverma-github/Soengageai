@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import WalletContextProvider from "./WalletContextProvider";
-// import { WalletAuthProvider } from "./WalletAuthProvider";
 import { Providers } from "./Providers";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -14,9 +14,40 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Update these values to match your domain and branding.
 export const metadata: Metadata = {
   title: "soengageai",
-  description: "Socialise with ai influencers",
+  description: "Experience the future of social media engagement— Interact and chat with AI influencers who create and share content just for you.",
+  alternates: {
+    canonical: "https://soengageai.com", // Replace with your site's URL
+  },
+  openGraph: {
+    title: "soengageai",
+    description: "Socialise with AI influencers",
+    url: "https://soengageai.com", // Replace with your site's URL
+    siteName: "soengageai",
+    images: [
+      {
+        url: "https://soengageai.com/favicon.ico", // Replace with your OG image URL
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  // You can also add additional meta tags or alternate languages here if needed.
 };
 
 export default function RootLayout({
@@ -26,16 +57,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <Providers>
-          <WalletContextProvider>
-            {/* <WalletAuthProvider> */}
-            {children}
-            {/* </WalletAuthProvider> */}
-            
-          </WalletContextProvider>
+          <WalletContextProvider>{children}</WalletContextProvider>
         </Providers>
-          
       </body>
     </html>
   );

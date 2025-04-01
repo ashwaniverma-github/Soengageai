@@ -6,6 +6,7 @@ export default function CreateInfluencerForm() {
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [adminAccessCode, setAdminAccessCode] = useState(""); // New state for access code
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -24,6 +25,7 @@ export default function CreateInfluencerForm() {
       formData.append("name", name);
       formData.append("bio", bio);
       formData.append("profilePicture", profilePicture);
+      formData.append("adminAccessCode", adminAccessCode); // Include the access code
 
       const res = await fetch("/api/profile/createProfile", {
         method: "POST",
@@ -41,8 +43,14 @@ export default function CreateInfluencerForm() {
       setName("");
       setBio("");
       setProfilePicture(null);
+      setAdminAccessCode(""); // Reset the access code
     } catch (error) {
       console.error(error);
+      if (error instanceof Error) {
+        setError(error.message || "An error occurred");
+      } else {
+        setError("An unknown error occurred");
+      }
     } finally {
       setLoading(false);
     }
@@ -51,7 +59,7 @@ export default function CreateInfluencerForm() {
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 bg-gray-900 text-white rounded-lg">
       <h2 className="text-xl font-semibold mb-4">Create AI Influencer</h2>
-      
+
       {error && <div className="mb-4 p-2 bg-red-600 text-white rounded">{error}</div>}
 
       <input
@@ -74,6 +82,15 @@ export default function CreateInfluencerForm() {
         type="file"
         accept="image/*"
         onChange={(e) => setProfilePicture(e.target.files?.[0] || null)}
+        className="w-full p-2 mb-4 border border-gray-700 rounded bg-gray-800"
+        required
+      />
+
+      <input
+        type="password" // Use password type for security
+        placeholder="Admin Access Code"
+        value={adminAccessCode}
+        onChange={(e) => setAdminAccessCode(e.target.value)}
         className="w-full p-2 mb-4 border border-gray-700 rounded bg-gray-800"
         required
       />

@@ -74,7 +74,7 @@ export default function Navbar({ bg }: { bg: string }) {
                 className="flex items-center gap-1 lg:gap-2 text-gray-300 hover:text-white px-2 lg:px-4"
               >
                 <Users className="h-5 w-5" />
-                <span className="text-sm lg:text-base">Community</span>
+                <span onClick={()=>{router.push('/aboutUs')}} className="text-sm lg:text-base">About us</span>
               </Button>
             </div>
           </div>
