@@ -192,7 +192,7 @@ export default function Feed() {
                     </div>
                   </Link>
                   <Link href={`/influencer/${influencer.id}`}>
-                    <button className="px-3 py-1 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-full transition-colors">
+                    <button  className="px-3 py-1 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-full transition-colors">
                       View
                     </button>
                   </Link>
