@@ -17,7 +17,8 @@ const geistMono = Geist_Mono({
 // Update these values to match your domain and branding.
 export const metadata: Metadata = {
   title: "soengageai",
-  description: "Experience the future of social media engagement— Interact and chat with AI influencers who create and share content just for you.",
+  description:
+    "Experience the future of social media engagement—Interact and chat with AI influencers who create and share content just for you.",
   alternates: {
     canonical: "https://soengageai.com", // Replace with your site's URL
   },
@@ -47,7 +48,9 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  // You can also add additional meta tags or alternate languages here if needed.
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
