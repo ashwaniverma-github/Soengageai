@@ -133,20 +133,15 @@ export default function Navbar({ bg }: { bg: string }) {
             <Button
               variant="ghost"
               className="w-full justify-start text-gray-300 hover:text-white"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <Bell className="h-5 w-5 mr-2" />
-              Notifications
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-gray-300 hover:text-white"
-              onClick={() => setIsMobileMenuOpen(false)}
+              onClick={() => {
+                router.push("/aboutUs"); // Redirect to About Us page
+                setIsMobileMenuOpen(false); // Close the mobile menu
+              }}
             >
               <Users className="h-5 w-5 mr-2" />
-              Community
+              About Us
             </Button>
-              <Button
+            <Button
               variant="ghost"
               className="w-full justify-start text-gray-300 hover:text-white"
               onClick={() => {
@@ -154,9 +149,9 @@ export default function Navbar({ bg }: { bg: string }) {
                 setIsMobileMenuOpen(false);
               }}
             >
+              <span className="h-5 w-5 mr-2">💰</span>
               Pricing
             </Button>
-          
           </div>
         </div>
       )}
