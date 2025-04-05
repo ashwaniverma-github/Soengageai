@@ -18,12 +18,12 @@ export async function POST(req: NextRequest) {
       input: {
         prompt: message,
         go_fast: false,
-        megapixels: "2",
+        megapixels: "1",
         num_outputs: 1,
         aspect_ratio: "1:1",
         output_format: "webp",
         output_quality: 100,
-        num_inference_steps: 10,
+        num_inference_steps: 4,
       },
     });
 
