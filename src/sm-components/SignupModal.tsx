@@ -1,6 +1,6 @@
 "use client";
 import { signIn } from "next-auth/react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+// import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import VisuallyHidden from "@/components/ui/visually-hidden";
 
@@ -44,7 +44,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             className="w-full flex justify-center"
             onClick={onClose} // This ensures that clicking on Connect Wallet closes the signup modal
           >
-            <WalletMultiButton
+            {/* <WalletMultiButton
               style={{
                 backgroundColor: "purple",
                 color: "white",
@@ -55,7 +55,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
               }}
             >
               Connect Wallet
-            </WalletMultiButton>
+            </WalletMultiButton> */}
           </div>
         </div>
       </DialogContent>

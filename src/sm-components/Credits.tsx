@@ -32,7 +32,7 @@ export default function Credits() {
   return (
     <div 
       onClick={() => router.push("/pricing")} 
-      className="flex items-center justify-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md transition-all duration-300 hover:shadow-lg cursor-pointer"
+      className="flex items-center justify-center px-4 py-2 rounded-lg bg-gradient-to-r  shadow-md transition-all duration-300 hover:shadow-lg cursor-pointer"
     >
       {loading ? (
         <div className="flex items-center text-white">
