@@ -22,7 +22,7 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
     {
       title: "Starter Plan",
       credits: 200,
-      price: 5,
+      price: 1,
       paymentType: "one-time",
       features: [
         "200 credits",
