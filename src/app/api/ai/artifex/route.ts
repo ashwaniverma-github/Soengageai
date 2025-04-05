@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
         aspect_ratio: "1:1",
         output_format: "webp",
         output_quality: 100,
-        num_inference_steps: 50,
+        num_inference_steps: 10,
       },
     });
 
