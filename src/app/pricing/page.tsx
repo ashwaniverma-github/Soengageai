@@ -130,7 +130,7 @@ function SubscriptionPageContent() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
         amount: amount, // Amount in paise
         currency: "INR",
-        name: "Soengage",
+        name: "Soengageai",
         description: `Purchase ${pkg.credits} credits`,
         order_id: orderId,
         handler: function (response: RazorpayResponse) {
