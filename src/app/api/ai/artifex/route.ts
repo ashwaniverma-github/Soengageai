@@ -17,13 +17,13 @@ export async function POST(req: NextRequest) {
       model: "black-forest-labs/flux-schnell",
       input: {
         prompt: message,
-        go_fast: true,
-        megapixels: "1",
+        go_fast: false,
+        megapixels: "2",
         num_outputs: 1,
         aspect_ratio: "1:1",
         output_format: "webp",
-        output_quality: 80,
-        num_inference_steps: 4,
+        output_quality: 100,
+        num_inference_steps: 50,
       },
     });
 
