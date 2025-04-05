@@ -4,106 +4,124 @@ import prisma from "@/lib/prisma";
 
 const RAZORPAY_SECRET = process.env.RAZORPAY_SECRET!;
 
-export async function POST(req: NextRequest) {
-  try {
-    // Step 1: Extract the webhook payload and signature
-    const body = await req.text(); // Raw body is required for signature verification
-    const signature = req.headers.get("x-razorpay-signature");
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
-    if (!signature) {
-      return NextResponse.json({ error: "Missing Razorpay signature" }, { status: 400 });
-    }
-
-    // Step 2: Verify the webhook signature
-    const expectedSignature = crypto
-      .createHmac("sha256", RAZORPAY_SECRET)
-      .update(body)
-      .digest("hex");
-
-    if (signature !== expectedSignature) {
-      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
-    }
-
-    // Step 3: Parse the webhook payload
-    const event = JSON.parse(body);
-
-    // Step 4: Handle the event based on its type
-    switch (event.event) {
-      case "payment.captured":
-        await handlePaymentCaptured(event.payload.payment.entity);
-        break;
-
-      case "payment.failed":
-        await handlePaymentFailed(event.payload.payment.entity);
-        break;
-
-      default:
-        console.log(`Unhandled event type: ${event.event}`);
-    }
-
-    // Step 5: Respond to Razorpay
-    return NextResponse.json({ status: "success" }, { status: 200 });
-  } catch (error) {
-    console.error("Error handling Razorpay webhook:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
-}
-
-// Function to handle payment captured event
 interface PaymentNotes {
-    userId: string;
-    credits: string;
+  userId: string;
+  credits: string;
 }
 
 interface PaymentEntity {
-    id: string;
-    order_id: string;
-    amount: number;
-    notes: PaymentNotes;
+  id: string;
+  order_id: string;
+  amount: number;
+  notes: PaymentNotes;
+}
+
+interface PaymentFailedEntity {
+  id: string;
+  error_code: string;
+  error_description: string;
 }
 
 async function handlePaymentCaptured(payment: PaymentEntity) {
-    const { id: paymentId, order_id: orderId, amount, notes } = payment;
+  const { id: paymentId, order_id, amount, notes } = payment;
+  const userId = notes?.userId;
+  const creditsStr = notes?.credits;
 
-    const userId = notes?.userId;
-    const creditsStr = notes?.credits;
+  if (!userId || !creditsStr) {
+    throw new Error("Missing userId or credits in payment notes");
+  }
 
-    if (!userId || !creditsStr) {
-        throw new Error("Missing userId or credits in payment notes");
-    }
+  const credits = parseInt(creditsStr, 10);
+  const amountInRupees = amount / 100;
 
-    const credits = parseInt(creditsStr, 10);
-    const amountInRupees = amount / 100;
+  // Idempotency check
+  const existingTransaction = await prisma.transaction.findUnique({
+    where: { paymentId },
+  });
 
-    // Update the database
-    await prisma.$transaction([
-        prisma.transaction.create({
-            data: {
-                userId,
-                orderId,
-                paymentId,
-                amount: amountInRupees,
-            },
-        }),
-        prisma.user.update({
-            where: { id: userId },
-            data: { credits: { increment: credits } },
-        }),
-    ]);
+  if (existingTransaction) {
+    console.log(`Payment ${paymentId} already processed`);
+    return;
+  }
 
-    console.log(`Payment captured: ${paymentId}, credits added: ${credits}`);
-}
+  // Database transaction
+  await prisma.$transaction([
+    prisma.transaction.create({
+      data: {
+        userId,
+        orderId: order_id,
+        paymentId,
+        amount: amountInRupees,
+      },
+    }),
+    prisma.user.update({
+      where: { id: userId },
+      data: { credits: { increment: credits } },
+    }),
+  ]);
 
-// Function to handle payment failed event
-interface PaymentFailedEntity {
-    id: string;
-    error_code: string;
-    error_description: string;
+  console.log(`Added ${credits} credits to user ${userId}`);
 }
 
 async function handlePaymentFailed(payment: PaymentFailedEntity) {
-    const { id: paymentId, error_code, error_description } = payment;
+  console.error(`Payment failed: ${payment.id} - ${payment.error_code}: ${payment.error_description}`);
+  // Add your failed payment handling logic here
+}
 
-    console.error(`Payment failed: ${paymentId}, error: ${error_code} - ${error_description}`);
-    // You can log this information or notify the user about the failure
+export async function POST(req: NextRequest) {
+  try {
+    const rawBody = await req.text();
+    const signature = req.headers.get("x-razorpay-signature");
+
+    if (!signature) {
+      return NextResponse.json({ error: "Missing signature" }, { status: 400 });
+    }
+
+    // Verify signature
+    const expectedSignature = crypto
+      .createHmac("sha256", RAZORPAY_SECRET)
+      .update(rawBody)
+      .digest("hex");
+
+    if (signature !== expectedSignature) {
+      console.error("Signature mismatch");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+    }
+
+    // Process event
+    const event = JSON.parse(rawBody);
+    console.log("Received event:", event.event);
+
+    try {
+      switch (event.event) {
+        case "payment.captured":
+          await handlePaymentCaptured(event.payload.payment.entity);
+          break;
+        case "payment.failed":
+          await handlePaymentFailed(event.payload.payment.entity);
+          break;
+        default:
+          console.log(`Unhandled event: ${event.event}`);
+      }
+    } catch (processingError) {
+      console.error("Error processing event:", processingError);
+      throw processingError;
+    }
+
+    // Return Razorpay-compliant response
+    return NextResponse.json({ status: "ok" }, { status: 200 });
+
+  } catch (error) {
+    console.error("Webhook error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }

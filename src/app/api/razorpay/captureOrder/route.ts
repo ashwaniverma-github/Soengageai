@@ -1,22 +1,23 @@
-// File: src/app/api/razorpay/captureOrder/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import crypto from "crypto";
 
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID!;
 const RAZORPAY_SECRET = process.env.RAZORPAY_SECRET!;
-const RAZORPAY_API_BASE = process.env.RAZORPAY_API_BASE || "https://api.razorpay.com";
+const RAZORPAY_API_BASE = process.env.RAZORPAY_API_BASE || "https://api.razorpay.com/v1";
 
 export async function GET(req: NextRequest) {
   try {
-    // Extract query parameters from the URL
-    const { payment_id, order_id, razorpay_signature } = Object.fromEntries(req.nextUrl.searchParams.entries());
+    // Validate parameters
+    const { payment_id, order_id, razorpay_signature } = Object.fromEntries(
+      req.nextUrl.searchParams.entries()
+    );
+
     if (!payment_id || !order_id || !razorpay_signature) {
-      throw new Error("Missing required query parameters");
+      throw new Error("Missing required parameters");
     }
 
-    // Verify the signature:
-    // Expected signature is HMAC_SHA256(order_id + "|" + payment_id, RAZORPAY_SECRET)
+    // Verify signature
     const generatedSignature = crypto
       .createHmac("sha256", RAZORPAY_SECRET)
       .update(`${order_id}|${payment_id}`)
@@ -26,39 +27,38 @@ export async function GET(req: NextRequest) {
       throw new Error("Invalid signature");
     }
 
-    // Optionally, fetch payment details from Razorpay API (if needed)
-    const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_SECRET}`).toString("base64");
-
-    const paymentRes = await fetch(`${RAZORPAY_API_BASE}/v1/payments/${payment_id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Basic ${auth}`,
-      },
+    // Idempotency check
+    const existingTransaction = await prisma.transaction.findUnique({
+      where: { paymentId: payment_id },
     });
+
+    if (existingTransaction) {
+      console.log(`Payment ${payment_id} already processed`);
+      return NextResponse.redirect(
+        new URL(`/pricing?payment=success`, process.env.NEXT_PUBLIC_BASE_URL!)
+      );
+    }
+
+    // Fetch payment details
+    const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_SECRET}`).toString("base64");
+    const paymentRes = await fetch(`${RAZORPAY_API_BASE}/payments/${payment_id}`, {
+      headers: { Authorization: `Basic ${auth}` },
+    });
+    
+    if (!paymentRes.ok) throw new Error("Failed to fetch payment details");
     const paymentData = await paymentRes.json();
 
-    // Fetch order details to extract our notes (userId and credits)
-    const orderRes = await fetch(`${RAZORPAY_API_BASE}/v1/orders/${order_id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Basic ${auth}`,
-      },
-    });
-    const orderData = await orderRes.json();
+    // Process payment
+    const amount = parseInt(paymentData.amount, 10) / 100;
+    const notes = paymentData.notes || {};
+    const userId = notes.userId;
+    const credits = parseInt(notes.credits, 10);
 
-    const notes = orderData.notes;
-    const userId = notes?.userId;
-    const creditsStr = notes?.credits;
-    if (!userId || !creditsStr) {
-      throw new Error("Missing userId or credits in order notes");
+    if (!userId || isNaN(credits)) {
+      throw new Error("Invalid user ID or credits");
     }
-    const credits = parseInt(creditsStr, 10);
 
-    // Payment amount (in paise) is available in paymentData.amount
-    const amountPaise = parseInt(paymentData.amount, 10);
-    const amount = amountPaise / 100;
-
-    // Update your database with the transaction and increment user credits
+    // Update database
     await prisma.$transaction([
       prisma.transaction.create({
         data: {
@@ -74,15 +74,16 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    // Redirect to success page
     return NextResponse.redirect(
-      new URL(`/pricing?payment=success&credits=${credits}`, process.env.NEXT_PUBLIC_BASE_URL)
+      new URL(`/pricing?payment=success&credits=${credits}`, process.env.NEXT_PUBLIC_BASE_URL!)
     );
+
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     console.error("Capture error:", errorMessage);
     return NextResponse.redirect(
-      new URL(`/pricing?payment=error&message=${encodeURIComponent(errorMessage)}`, process.env.NEXT_PUBLIC_BASE_URL)
+      new URL(`/pricing?payment=error&message=${encodeURIComponent(errorMessage)}`, 
+      process.env.NEXT_PUBLIC_BASE_URL!)
     );
   }
 }
