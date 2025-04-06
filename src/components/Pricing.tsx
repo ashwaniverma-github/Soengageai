@@ -21,7 +21,7 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
   const packages: CreditPackage[] = [
     {
       title: "Starter Plan",
-      credits: 200,
+      credits: 100,
       price: 5,
       paymentType: "one-time",
       features: [
@@ -32,7 +32,7 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
     },
     {
       title: "Basic Plan",
-      credits: 500,
+      credits: 220,
       price: 10,
       paymentType: "one-time",
       features: [
@@ -43,8 +43,8 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
     },
     {
       title: "Discounted Plan",
-      credits: 1000,
-      price: 15,
+      credits: 500,
+      price: 20,
       paymentType: "one-time",
       features: [
         "1000 Credits",
