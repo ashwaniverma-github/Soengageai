@@ -14,16 +14,17 @@ export async function POST(req: NextRequest) {
     
     // Start the prediction
     const prediction = await replicate.predictions.create({
-      model: "black-forest-labs/flux-schnell",
+      model: "black-forest-labs/flux-dev",
       input: {
         prompt: message,
-        go_fast: false,
+        go_fast: true,
         megapixels: "1",
         num_outputs: 1,
         aspect_ratio: "1:1",
-        output_format: "webp",
+        output_format: "png",
         output_quality: 100,
-        num_inference_steps: 4,
+        num_inference_steps: 50,
+        disable_safety_checker:true
       },
     });
 
