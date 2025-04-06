@@ -133,9 +133,9 @@ function SubscriptionPageContent() {
         name: "Soengageai",
         description: `Purchase ${pkg.credits} credits`,
         order_id: orderId,
-        handler: function (response: RazorpayResponse) {
+        handler: function () {
           // On successful payment, redirect to capture endpoint
-          window.location.href = `/api/razorpay/captureOrder?payment_id=${response.razorpay_payment_id}&order_id=${orderId}&razorpay_signature=${response.razorpay_signature}`;
+          window.location.href = `/pricing?payment=success&credits=${pkg.credits}`;
         },
         prefill: {
           name: userName,
