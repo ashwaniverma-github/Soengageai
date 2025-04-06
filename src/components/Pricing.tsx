@@ -63,21 +63,21 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
 
   return (
     <div className="mx-auto min-h-screen p-4 md:p-6 lg:p-8 bg-gradient-to-b from-black to-gray-900 max-w-6xl">
-      <div className="text-center mb-12">
+      <div className="text-center mb-8 ">
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Choose Your Plan</h1>
-          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4">Choose Your Plan</h1>
+          <p className="text-gray-300 text-base md:text-lg max-w-2xl mx-auto">
             Find the perfect plan for your needs. Every plan includes access to our core features.
           </p>
-          <div className="my-8 border-b border-purple-500/30 w-24 mx-auto" />
+          <div className="my-6 md:my-8 border-b border-purple-500/30 w-24 mx-auto" />
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 px-4 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl  mx-auto">
         {packages.map((pkg, index) => {
           // Determine the styling based on the card index
           
@@ -107,7 +107,7 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
               } rounded-2xl overflow-hidden shadow-xl`}
             >
               {/* Card Header */}
-              <div className={`p-6 ${
+              <div className={`p-4 md:p-6 ${
                 isDiscountedCard 
                   ? "bg-purple-900/20" 
                   : isMiddleCard 
@@ -124,11 +124,11 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
                   }`}>
                     {icons[index]}
                   </div>
-                  <h3 className="text-xl font-bold text-white">{pkg.title}</h3>
+                  <h3 className="text-lg md:text-xl font-bold text-white">{pkg.title}</h3>
                 </div>
                 
                 <div className="flex items-baseline mb-1">
-                  <span className="text-4xl font-bold text-white">${pkg.price}</span>
+                  <span className="text-3xl md:text-4xl font-bold text-white">${pkg.price}</span>
                   <span className="text-gray-400 ml-2">/{pkg.paymentType}</span>
                 </div>
                 <p className="text-gray-400 text-sm mb-2">
@@ -142,17 +142,17 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
               <div className="w-full border-t border-gray-700/50"></div>
               
               {/* Features List */}
-              <div className="p-6">
-                <p className="text-gray-300 font-medium mb-4">Includes:</p>
-                <ul className="space-y-3 mb-8">
+              <div className="p-4 md:p-6">
+                <p className="text-gray-300 font-medium mb-3 md:mb-4">Includes:</p>
+                <ul className="space-y-2 md:space-y-3 mb-6 md:mb-8">
                   {pkg.features.map((feature) => (
                     <motion.li
                       key={feature}
                       whileHover={{ x: 5 }}
                       className="flex items-center text-gray-300"
                     >
-                      <Check className="h-4 w-4 text-green-400 mr-3 flex-shrink-0" />
-                      <span className="text-sm">{feature}</span>
+                      <Check className="h-4 w-4 text-green-400 mr-2 md:mr-3 flex-shrink-0" />
+                      <span className="text-xs md:text-sm">{feature}</span>
                     </motion.li>
                   ))}
                 </ul>
@@ -164,7 +164,7 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
                 >
                   <Button
                     onClick={() => onBuy(pkg)}
-                    className={`w-full py-5 text-center text-white font-medium rounded-xl ${
+                    className={`w-full py-3 md:py-5 text-center text-white font-medium rounded-xl ${
                       isDiscountedCard 
                         ? "bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 shadow-lg shadow-purple-900/30" 
                         : isMiddleCard 

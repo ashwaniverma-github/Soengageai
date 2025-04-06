@@ -179,7 +179,7 @@ function SubscriptionPageContent() {
           }}
         />
       )}
-      <div className="bg-black p-16">
+      <div className="bg-black pt-16 px-4">
         <Pricing onBuy={handleBuy} />
         <SignupModal isOpen={isSignupOpen} onClose={() => setIsSignupOpen(false)} />
       </div>
