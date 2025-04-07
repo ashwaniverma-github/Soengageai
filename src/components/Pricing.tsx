@@ -25,7 +25,7 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
       price: 5,
       paymentType: "one-time",
       features: [
-        "200 credits",
+        "100 Credits",
         "Access to every AI Influencer",
         "chats"
       ]
@@ -36,7 +36,7 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
       price: 10,
       paymentType: "one-time",
       features: [
-        "500 Credits",
+        "220 Credits",
         "Access to every AI influencer",
         "Chats",
       ]
@@ -47,7 +47,7 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
       price: 20,
       paymentType: "one-time",
       features: [
-        "1000 Credits",
+        "500 Credits",
         "Access to every AI influencer",
         "Chats",
       ]
