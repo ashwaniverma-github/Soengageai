@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID!;
 const RAZORPAY_SECRET = process.env.RAZORPAY_SECRET!;
 const RAZORPAY_API_BASE = process.env.RAZORPAY_API_BASE || "https://api.razorpay.com";
-
+const EXCHANGE_RATE_API = process.env.EXCHANGE_RATE_API || "https://api.exchangerate-api.com/v4/latest/USD"
 export async function POST(req: NextRequest) {
   try {
     const { credits, price, userId } = await req.json(); // e.g., { "credits": 500, "price": 20, "userId": "user-uuid" }
@@ -20,8 +20,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    let exchangeRate = 80;
+    try{
+      const exchangeRateRes = await fetch(EXCHANGE_RATE_API);
+      if(exchangeRateRes.ok){
+        const exchangeRateData = await exchangeRateRes.json()
+        exchangeRate = exchangeRateData.rates.INR || exchangeRate;
+      } else{
+        console.warn("Exchnage rate api failed using default rate of 80")
+      }
+    }catch(error){
+      console.warn("Error fetching exchange rate, using default rate of 80:", error);
+    }
     // Convert price to paise (e.g., 20 INR becomes 2000 paise)
-    const exchangeRate = 80; // Replace with your conversion rate or a dynamic value
+    // const exchangeRate = 80; // Replace with your conversion rate or a dynamic value
     const amountInINR = price * exchangeRate; // Now in INR
     const amountPaise = Math.round(amountInINR * 100);
 
