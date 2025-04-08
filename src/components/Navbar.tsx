@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, Home, Users, Menu, X} from "lucide-react";
+// import { Input } from "@/components/ui/input";
+import { Home, Users, Menu, X} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
