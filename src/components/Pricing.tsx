@@ -23,24 +23,24 @@ const Pricing: FC<CreditPricingProps> = ({ onBuy }) => {
   const packages: CreditPackage[] = [
     {
       title: "Starter Plan",
-      credits: 100,
+      credits: 50,
       price: 5,
       paymentType: "one-time",
-      features: ["100 Credits", "Access to every AI Influencer", "Chats"],
+      features: ["50 Credits", "Access to every AI Influencer", "Chats"],
     },
     {
       title: "Basic Plan",
-      credits: 220,
+      credits: 110,
       price: 10,
       paymentType: "one-time",
-      features: ["220 Credits", "Access to every AI influencer", "Chats"],
+      features: ["110 Credits", "Access to every AI influencer", "Chats"],
     },
     {
       title: "Discounted Plan",
-      credits: 500,
+      credits: 250,
       price: 20,
       paymentType: "one-time",
-      features: ["500 Credits", "Access to every AI influencer", "Chats"],
+      features: ["250 Credits", "Access to every AI influencer", "Chats"],
     },
   ];
 
