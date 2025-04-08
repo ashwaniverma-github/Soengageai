@@ -270,25 +270,30 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
       </div>
 
       <div className="p-2 sm:p-4 border-t border-gray-700 bg-gray-900">
-        <div className="flex gap-2">
+        <div className="flex items-end gap-2">
           <textarea
             value={input}
             disabled={isProcessing}
             placeholder="Type your message..."
             onChange={(e) => setInput(e.target.value)}
+            onInput={(e) => {
+              const target = e.target as HTMLTextAreaElement;
+              target.style.height = "38px"; // Reset to default height
+              target.style.height = `${Math.min(150, Math.max(38, target.scrollHeight))}px`; // Set height with max limit
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey && !isProcessing) {
                 e.preventDefault();
                 sendMessage();
               }
             }}
-            className="flex-1 resize-none p-2 sm:p-3 rounded-full focus:outline-none bg-gray-800 text-gray-100 placeholder-gray-400 disabled:opacity-50 text-sm sm:text-base"
+            className="flex-1 resize-none p-2 sm:p-3 rounded-xl focus:outline-none bg-gray-800 text-gray-100 placeholder-gray-400 disabled:opacity-50 text-sm sm:text-base min-h-[38px] max-h-[150px] overflow-y-auto"
             rows={1}
           />
           <button
             onClick={sendMessage}
             disabled={!input.trim() || isProcessing}
-            className="p-2 sm:p-3 h-auto rounded-full bg-purple-700 hover:bg-purple-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 sm:p-3 rounded-full bg-purple-700 hover:bg-purple-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center"
           >
             <CircleArrowUp className="w-5 h-5 sm:w-6 sm:h-6 text-gray-100" />
           </button>
