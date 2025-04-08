@@ -45,7 +45,7 @@ export default function Homepage() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-3xl sm:text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-slate-300 mb-8"
           >
-            Socialise With AI Models
+            Socialize With AI Influencers
           </motion.h1>
 
           <motion.div
