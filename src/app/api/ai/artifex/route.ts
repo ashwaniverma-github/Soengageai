@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     console.log("Generated Image URL:", imageUrl);
 
     // In your API route
-    return NextResponse.json({ response: imageUrl })
+    return NextResponse.json({ response: imageUrl , isImage:true })
     
   } catch (error) {
     if (error instanceof Error) {

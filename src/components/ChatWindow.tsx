@@ -146,10 +146,10 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
 
       const aiMessage: ChatMessage = {
         sender: "ai",
-        text: data.imageUrl || data.response,
+        text: data.response, // Use response as the text
         displayText: "",
         timestamp: Date.now().toString(),
-        isImage: Boolean(data.isImage),
+        isImage: Boolean(data.isImage), // Ensure isImage is set correctly
         creditDeducted: false,
       };
 

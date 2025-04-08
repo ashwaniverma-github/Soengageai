@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
       console.log("Generated Image URL:", imageUrl);
 
       // Return the image URL as the response
-      return NextResponse.json({ response: `Here is your generated image: ${imageUrl}`, imageUrl, isImage: true }, { status: 200 });
+      return NextResponse.json({ response: imageUrl, isImage: true }, { status: 200 });
     } else {
       // Generate text response using Google Generative AI
       const result = await model.generateContent(fullPrompt);
