@@ -46,14 +46,14 @@ export default function Navbar({ bg }: { bg: string }) {
               </span>
             </Link>
             {/* Search bar - visible only on lg screens and up */}
-            <div className="relative ml-4 w-64 hidden lg:block">
+            {/* <div className="relative ml-4 w-64 hidden lg:block">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 type="search"
                 placeholder="Search..."
                 className="w-full pl-10 rounded-full bg-gray-900 border-gray-700 text-gray-300 focus:ring-purple-500 focus:border-purple-500"
               />
-            </div>
+            </div> */}
           </div>
 
           {/* Center Section - Navigation Items */}
