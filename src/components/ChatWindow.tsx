@@ -11,6 +11,7 @@ interface ChatMessage {
   isImage?: boolean;
   isLoading?: boolean;
   creditDeducted?: boolean;
+  isCreditError?: boolean;
 }
 
 interface ChatWindowProps {
@@ -48,7 +49,6 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Typing effect for AI messages
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
     if (
@@ -101,7 +101,6 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
     if (!input.trim() || isProcessing) return;
     setIsProcessing(true);
 
-    // Add user message
     const userMessage: ChatMessage = {
       sender: "user",
       text: input,
@@ -109,7 +108,6 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
       timestamp: Date.now().toString(),
     };
 
-    // Add temporary loading message
     const loadingMessage: ChatMessage = {
       sender: "ai",
       text: "",
@@ -123,21 +121,25 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
     setInput("");
 
     try {
-      // Check credits before making a request to Artifex AI
-      if (influencerName === "artifex" || influencerName === "donna") {
+      const isImageRequest = /generate an image|create an image|send me your pic|how you look|pic|image|show me/i.test(
+        currentInput
+      );
+
+      if (
+        influencerName === "artifex" ||
+        (influencerName === "donna" && isImageRequest)
+      ) {
         const credits = await getCurrentCredits();
         if (credits < 1) {
-          throw new Error("Insufficient credits - please purchase more to generate images");
+          throw new Error("Insufficient credits - please purchase credits to continue.");
         }
       }
 
-      // Fetch AI response
       const res = await fetch(`/api/ai/${influencerName}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: currentInput }),
       });
-
       if (!res.ok) throw new Error("Request failed");
 
       const data = await res.json();
@@ -147,27 +149,30 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
         text: data.imageUrl || data.response,
         displayText: "",
         timestamp: Date.now().toString(),
-        isImage: data.isImage || false, // Use the isImage flag from the API response
+        isImage: Boolean(data.isImage),
         creditDeducted: false,
       };
 
-      setMessages((prev) => prev.map((msg) => (msg.isLoading ? aiMessage : msg)));
+      setMessages((prev) =>
+        prev.map((msg) => (msg.isLoading ? aiMessage : msg))
+      );
 
-      // Deduct credits **ONLY IF** response was successful and influencer is "artifex" or "donna"
-      if ((influencerName === "artifex" || influencerName === "donna") && data.isImage) {
+      if (
+        influencerName === "artifex" ||
+        (influencerName === "donna" && data.isImage)
+      ) {
         await spendCredits(1);
       }
     } catch (error) {
       console.error("Error:", error);
       setMessages((prev) => prev.filter((msg) => !msg.isLoading));
-
       const errorMessage: ChatMessage = {
         sender: "ai",
         text: error instanceof Error ? error.message : "Request failed",
         displayText: error instanceof Error ? error.message : "Request failed",
         timestamp: Date.now().toString(),
+        isCreditError: error instanceof Error && error.message.includes("Insufficient credits"),
       };
-
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsProcessing(false);
@@ -206,45 +211,53 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
                 msg.sender === "user" ? "bg-purple-800 text-white" : "bg-gray-800 text-gray-100 shadow-md"
               }`}
             >
-              <div className="break-words text-sm sm:text-base">
-                {msg.isLoading ? (
-                  <div className="flex items-center justify-center p-2">
-                    <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-gray-300"></div>
+              {msg.isLoading ? (
+                <div className="flex items-center justify-center p-2">
+                  <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-gray-300"></div>
+                </div>
+              ) : msg.isImage ? (
+                <>
+                  <Image
+                    src={msg.text}
+                    width={512}
+                    height={512}
+                    alt="Generated content"
+                    className="rounded-lg w-full h-auto"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                      setMessages((prev) => prev.filter((m) => m.timestamp !== msg.timestamp));
+                    }}
+                    unoptimized
+                  />
+                  <div className="mt-2">
+                    <a
+                      href={msg.text}
+                      download={`generated-${msg.timestamp}.png`}
+                      className="text-blue-500 underline text-sm flex items-center gap-1"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download
+                    </a>
                   </div>
-                ) : msg.isImage ? (
-                  <>
-                    <Image
-                      src={msg.text}
-                      width={512}
-                      height={512}
-                      alt="Generated content"
-                      className="rounded-lg w-full h-auto"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
-                        setMessages((prev) => prev.filter((m) => m.timestamp !== msg.timestamp));
-                      }}
-                      unoptimized
-                    />
-                    <div className="mt-2">
-                      <a
-                        href={msg.text}
-                        download={`generated-${msg.timestamp}.png`}
-                        className="text-blue-500 underline text-sm flex items-center gap-1"
-                      >
-                        <Download className="w-4 h-4" />
-                        Download
-                      </a>
-                    </div>
-                  </>
-                ) : (
-                  <>
+                </>
+              ) : (
+                <>
+                  <div className="break-words text-sm sm:text-base">
                     {formatResponseText(msg.displayText)}
                     {msg.sender === "ai" && msg.displayText.length < msg.text.length && (
                       <span className="ml-1 inline-block w-2 h-4 bg-gray-100 animate-blink" />
                     )}
-                  </>
-                )}
-              </div>
+                  </div>
+                  {msg.isCreditError && (
+                    <button
+                      onClick={() => window.location.href = '/pricing'}
+                      className="mt-2 bg-red-600 hover:bg-red-800 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm"
+                    >
+                      Buy Credits
+                    </button>
+                  )}
+                </>
+              )}
               {!msg.isLoading && (
                 <p className={`text-xs mt-1 ${msg.sender === "user" ? "text-purple-300" : "text-gray-400"}`}>
                   {formatTimestamp(msg.timestamp)}
