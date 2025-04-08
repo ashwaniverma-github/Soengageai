@@ -97,11 +97,10 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
     }
   };
 
-
   const sendMessage = async () => {
     if (!input.trim() || isProcessing) return;
     setIsProcessing(true);
-  
+
     // Add user message
     const userMessage: ChatMessage = {
       sender: "user",
@@ -109,7 +108,7 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
       displayText: input,
       timestamp: Date.now().toString(),
     };
-  
+
     // Add temporary loading message
     const loadingMessage: ChatMessage = {
       sender: "ai",
@@ -118,65 +117,62 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
       timestamp: Date.now().toString(),
       isLoading: true,
     };
-  
+
     setMessages((prev) => [...prev, userMessage, loadingMessage]);
     const currentInput = input;
     setInput("");
-  
+
     try {
       // Check credits before making a request to Artifex AI
-      if (influencerName === "artifex") {
+      if (influencerName === "artifex" || influencerName === "donna") {
         const credits = await getCurrentCredits();
         if (credits < 1) {
           throw new Error("Insufficient credits - please purchase more to generate images");
         }
       }
-  
+
       // Fetch AI response
       const res = await fetch(`/api/ai/${influencerName}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: currentInput }),
       });
-  
+
       if (!res.ok) throw new Error("Request failed");
-  
+
       const data = await res.json();
-      const isImageResponse = influencerName === "artifex";
-  
+
       const aiMessage: ChatMessage = {
         sender: "ai",
         text: data.imageUrl || data.response,
         displayText: "",
         timestamp: Date.now().toString(),
-        isImage: isImageResponse,
+        isImage: data.isImage || false, // Use the isImage flag from the API response
         creditDeducted: false,
       };
-  
-      setMessages((prev) => prev.map(msg => msg.isLoading ? aiMessage : msg));
-  
-      // Deduct credits **ONLY IF** response was successful and influencer is "artifex"
-      if (influencerName === "artifex") {
+
+      setMessages((prev) => prev.map((msg) => (msg.isLoading ? aiMessage : msg)));
+
+      // Deduct credits **ONLY IF** response was successful and influencer is "artifex" or "donna"
+      if ((influencerName === "artifex" || influencerName === "donna") && data.isImage) {
         await spendCredits(1);
       }
-  
     } catch (error) {
       console.error("Error:", error);
-      setMessages((prev) => prev.filter(msg => !msg.isLoading));
-  
+      setMessages((prev) => prev.filter((msg) => !msg.isLoading));
+
       const errorMessage: ChatMessage = {
         sender: "ai",
         text: error instanceof Error ? error.message : "Request failed",
         displayText: error instanceof Error ? error.message : "Request failed",
         timestamp: Date.now().toString(),
       };
-  
+
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsProcessing(false);
     }
   };
-  
 
   const formatTimestamp = (timestamp: string) => {
     try {
@@ -188,7 +184,7 @@ export default function ChatWindow({ influencerName, onClose }: ChatWindowProps)
   };
 
   return (
-    <div className="flex flex-col w-full h-full max-h-[600px] sm:max-w-md md:max-w-lg lg:max-w-2xl bg-gray-900 rounded-2xl shadow-xl overflow-hidden border border-gray-700">
+    <div className="flex flex-col w-full h-full max-h-[800px] sm:max-w-md md:max-w-lg lg:max-w-2xl bg-gray-900 rounded-2xl shadow-xl overflow-hidden border border-gray-700">
       <div className="flex items-center justify-between p-3 sm:p-4 bg-purple-950 text-white">
         <h2 className="text-base sm:text-xl font-bold truncate">Chat with {influencerName}</h2>
         <button

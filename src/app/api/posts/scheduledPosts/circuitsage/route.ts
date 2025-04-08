@@ -1,4 +1,4 @@
-// src/app/api/scheduled/posts/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import FormData from "form-data";

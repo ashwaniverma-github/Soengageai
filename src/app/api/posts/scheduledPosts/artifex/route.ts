@@ -1,4 +1,4 @@
-// src/app/api/scheduled/posts/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import FormData from "form-data";
@@ -17,7 +17,7 @@ export async function GET(req:NextRequest) {
     const autoTextRes = await fetch(`${baseUrl}/api/ai/autoPostGenerationText`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "Give me a  high quality creative prompt for generating a image of human , girl , boy , cenamatic view , space . give only one prompt 20-30 words nothing else directly give the prompt" }),
+      body: JSON.stringify({ message: "Give me a  high quality creative prompt for generating a image of human , girl , boy , cenamatic view . give only one prompt 20-30 words nothing else directly give the prompt" }),
     });
     if (!autoTextRes.ok) {
       throw new Error("Failed to get auto post text");

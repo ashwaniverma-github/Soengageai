@@ -124,6 +124,7 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 96px, 160px"
+                  quality={100}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-purple-900/50">

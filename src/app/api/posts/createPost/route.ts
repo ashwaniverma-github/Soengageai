@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
       }
 
       imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/posts/${filePath}`;
+      console.log('saved image' + imageUrl)
     }
 
     // Save post in database; if imageUrl is null, it won't be saved.
