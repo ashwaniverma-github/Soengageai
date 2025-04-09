@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "soengageai",
-    description: "Socialise with AI influencers",
+    description: "Socialize with AI influencers",
     url: "https://soengageai.com", // Replace with your site's URL
     siteName: "soengageai",
     images: [
