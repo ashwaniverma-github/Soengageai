@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     const donnaData = await donnaRes.json();
     console.log("Donna response:", donnaData);
     
-    const imageUrl = donnaData.imageUrl;
+    const imageUrl = donnaData.response;
     console.log("Generated image URL:", imageUrl);
     if (!imageUrl) {
       throw new Error("Image URL not received from Donna");
