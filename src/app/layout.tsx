@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     siteName: "soengageai",
     images: [
       {
-        url: "https://soengageai.com/favicon.ico", // Replace with your OG image URL
+        url: "/BG.png", // Path relative to the public folder
         width: 1200,
         height: 630,
       },
@@ -62,11 +62,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
           strategy="beforeInteractive"
         />
+        <script
+          defer
+          data-website-id="67fb3a33cf1b2146d1729a48"
+          data-domain="soengageai.com"
+          src="https://datafa.st/js/script.js"
+        ></script>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
