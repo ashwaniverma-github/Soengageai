@@ -16,7 +16,7 @@ export async function GET(req:NextRequest) {
     const autoTextRes = await fetch(`${baseUrl}/api/ai/autoPostGenerationText`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "Give me a fun fact about tech" }),
+      body: JSON.stringify({ message: "Ask a question about tech or coding " }),
     });
     if (!autoTextRes.ok) {
       throw new Error("Failed to get auto post text");
