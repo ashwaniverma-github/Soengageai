@@ -5,11 +5,38 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, User, ImageIcon } from "lucide-react";
+import { Calendar, User, ImageIcon, MessageSquare, BookOpen } from "lucide-react";
 import ChatWindow from "@/components/ChatWindow";
 import { AIInfluencer, Post } from "@/types/types";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import PostContentOnly from "@/sm-components/PostContentOnly";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+
+// Utility function to parse basic markdown (bold text)
+const parseMarkdown = (text: string) => {
+  // Replace **text** with <strong>text</strong>
+  return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+};
+
+// Enhanced component for text-only posts
+const TextPostCard = ({ content, gradient = "from-purple-600 to-blue-600" }: { content: string; gradient?: string }) => {
+  // Extract the first sentence or up to 15 words for the featured text
+  const featuredText = content.split(/[.!?]/, 1)[0] || content.split(/\s+/).slice(0, 15).join(" ");
+  
+  // Parse markdown in the featured text
+  const parsedText = parseMarkdown(featuredText);
+  
+  return (
+    <div className="relative w-full h-full flex items-center justify-center overflow-hidden bg-gray-900 p-4">
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-10`}></div>
+      <div className="absolute top-3 left-3">
+        <BookOpen size={18} className="text-gray-400" />
+      </div>
+      <p 
+        className="text-center font-medium text-sm md:text-base text-white line-clamp-5 px-2 z-10"
+        dangerouslySetInnerHTML={{ __html: `"${parsedText.trim()}"` }}
+      />
+    </div>
+  );
+};
 
 export default function InfluencerPage({ params }: { params: Promise<{ id: string }> }) {
   // Unwrap the params Promise
@@ -48,6 +75,18 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
     fetchInfluencer();
   }, [influencerId]);
 
+  // Generate a random gradient for text posts
+  const getRandomGradient = () => {
+    const gradients = [
+      "from-purple-600 to-blue-600",
+      "from-blue-600 to-cyan-500",
+      "from-pink-500 to-purple-600",
+      "from-amber-500 to-pink-500",
+      "from-emerald-500 to-blue-500"
+    ];
+    return gradients[Math.floor(Math.random() * gradients.length)];
+  };
+
   if (loading) {
     return (
       <div className="container min-h-screen w-full mx-auto px-4 py-8 bg-zinc-950">
@@ -61,8 +100,8 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
               <div className="h-4 bg-gray-800/50 rounded w-2/3"></div>
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            {[1, 2, 3].map((i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="bg-gray-800/30 rounded-xl h-60"></div>
             ))}
           </div>
@@ -73,13 +112,13 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
 
   if (error) {
     return (
-      <div className="container min-h-screen mx-auto px-4 py-16  text-center">
+      <div className="container min-h-screen mx-auto px-4 py-16 text-center">
         <div className="bg-red-900/20 border border-red-500/50 rounded-xl p-8 max-w-md mx-auto">
           <div className="text-red-500 text-4xl mb-4">😕</div>
           <h2 className="text-xl font-bold text-red-400 mb-2">{error}</h2>
-          <p className=" text-white mb-6">We couldn&apos;t find what you&apos;re looking for.</p>
+          <p className="text-white mb-6">We couldn&apos;t find what you&apos;re looking for.</p>
           <Link href="/">
-            <Button variant="outline" className=" text-white border-red-500/50 hover:bg-red-950/50">
+            <Button variant="outline" className="text-white border-red-500/50 hover:bg-red-950/50">
               Back to Home
             </Button>
           </Link>
@@ -114,17 +153,19 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
 
       <div className="container mx-auto px-4 max-w-6xl relative">
         {/* Profile Section */}
-        <div className="flex flex-row gap-6 -mt-12 md:-mt-20 mb-8 relative z-10">
-          <div className="relative">
-            <div className="w-24 h-24 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-gray-950 shadow-xl bg-gray-800">
+        <div className="flex flex-col md:flex-row gap-6 -mt-12 md:-mt-20 mb-8 relative z-10">
+          {/* Profile Picture Container */}
+          <div className="relative mx-auto md:mx-0"> {/* Added mx-auto for mobile centering */}
+            <div className="w-32 h-40 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-gray-950 shadow-xl bg-gray-800">
               {influencer.profilePicture ? (
                 <Image
                   src={influencer.profilePicture}
                   alt={influencer.name}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 96px, 160px"
+                  sizes="(max-width: 768px) 128px, 160px" // Updated sizes for mobile
                   quality={100}
+                  priority // Added priority loading
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-purple-900/50">
@@ -132,9 +173,11 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
                 </div>
               )}
             </div>
+            {/* Status indicator */}
             <div className="absolute bottom-0 right-0 w-6 h-6 md:w-8 md:h-8 bg-green-500 rounded-full border-2 border-gray-950"></div>
           </div>
 
+          {/* Rest of the profile content */}
           <div className="flex-1 text-left space-y-2 md:space-y-3 mt-1 md:mt-12">
             <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
               <h1 className="text-xl md:text-3xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
@@ -162,73 +205,87 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
             <div className="flex flex-wrap gap-3 justify-start mt-1">
               <Button
                 onClick={() => setChatOpen(true)}
-                className="rounded-full text-white font-semibold bg-purple-600 hover:bg-purple-700 px-4 py-1 h-8 md:h-10 text-xs md:text-sm"
+                className="rounded-full text-white font-medium bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 px-4 py-1 h-8 md:h-10 text-xs md:text-sm flex items-center gap-2"
               >
-                Chat
+                <MessageSquare size={16} />
+                Chat with {influencer.name.split(' ')[0]}
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Posts Grid */}
+        {/* Posts Grid - Improved layout for posts with markdown support */}
         <div className="mt-6 md:mt-8 pb-16">
           <h2 className="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">Posts</h2>
 
           {influencer.posts.length > 0 ? (
-            <div className="grid grid-cols-3 gap-2 md:gap-6 mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 mb-12">
               {influencer.posts
                 .slice()
                 .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                .map((post) => (
-                  <Card
-                    onClick={() => setSelectedPost(post)}
-                    key={post.id}
-                    className="cursor-pointer bg-gray-900/50 border-gray-800 hover:border-gray-700 transition-all hover:shadow-lg hover:shadow-purple-900/10 overflow-hidden"
-                  >
-                    <CardContent className="p-0 ">
-                      <div className="relative aspect-square group ">
-                        {post.imageUrl ? (
-                          <Image
-                            src={post.imageUrl}
-                            alt={post.content.substring(0, 30)}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                            sizes="(max-width: 640px) 33vw, (max-width: 1024px) 33vw, 33vw"
+                .map((post) => {
+                  const isTextPost = !post.imageUrl;
+                  const gradient = getRandomGradient();
+                  // Parse markdown in the post content
+                  const parsedContent = parseMarkdown(post.content);
+                  
+                  return (
+                    <Card
+                      onClick={() => setSelectedPost(post)}
+                      key={post.id}
+                      className={`cursor-pointer bg-gray-900/50 border-gray-800 hover:border-gray-700 transition-all duration-300 hover:shadow-lg 
+                        ${isTextPost ? `hover:shadow-${gradient.split('-')[1]}-900/20` : 'hover:shadow-purple-900/10'} 
+                        overflow-hidden transform hover:scale-[1.01]`}
+                    >
+                      <CardContent className="p-0">
+                        <div className="relative aspect-square group">
+                          {post.imageUrl ? (
+                            <Image
+                              src={post.imageUrl}
+                              alt={post.content.substring(0, 30)}
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-500"
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            />
+                          ) : (
+                            <TextPostCard content={post.content} gradient={gradient} />
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-gray-950 to-transparent opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
+                        </div>
+                        <div className="p-3 md:p-4 space-y-1 md:space-y-2">
+                          {/* Display content with parsed markdown */}
+                          <div 
+                            className="text-gray-300 text-xs md:text-sm line-clamp-2 min-h-[2rem] md:min-h-[2.5rem]"
+                            dangerouslySetInnerHTML={{ __html: parsedContent }}
                           />
-                        ) : (
-                          <PostContentOnly content={post.content} />
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 to-transparent opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
-                      </div>
-                      <div className="p-2 md:p-4 space-y-1 md:space-y-2">
-                        <p className="text-gray-300 text-xs md:text-sm line-clamp-2 min-h-[1.5rem] md:min-h-[2.5rem]">{post.content}</p>
-                        <div className="flex justify-between items-center pt-1 md:pt-2">
-                          <div className="text-xs text-gray-500">
-                            {new Date(post.createdAt).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                            })}
+                          <div className="flex justify-between items-center pt-1 md:pt-2">
+                            <div className="text-xs text-gray-500">
+                              {new Date(post.createdAt).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
             </div>
           ) : (
             <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 md:p-12 text-center mb-12">
               <div className="text-gray-500 text-3xl md:text-4xl mb-3 md:mb-4">📸</div>
               <h3 className="text-lg md:text-xl font-medium text-gray-300 mb-2">No Posts Yet</h3>
               <p className="text-sm md:text-base text-gray-400 mb-4 md:mb-6 max-w-md mx-auto">
-                {influencer.name} hasn&apos;t shared any content yet. Check back later. 
+                {influencer.name} hasn&apos;t shared any content yet. Check back later.
               </p>
             </div>
           )}
 
-          {/* Expanded Post Modal */}
-          {selectedPost && selectedPost.imageUrl && (
+          {/* Enhanced Post Modal with markdown support and scrollable content */}
+          {selectedPost && (
             <Dialog open onOpenChange={() => setSelectedPost(null)}>
-              <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 bg-transparent border-none">
+              <DialogContent className="max-w-2xl p-0 bg-gray-900 border-gray-800">
                 <button
                   onClick={() => setSelectedPost(null)}
                   className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
@@ -236,14 +293,40 @@ export default function InfluencerPage({ params }: { params: Promise<{ id: strin
                   <span className="sr-only">Close</span>
                   ✕
                 </button>
-                <div className="relative w-full h-[90vh]">
-                  <Image
-                    src={selectedPost.imageUrl}
-                    alt="Expanded post image"
-                    fill
-                    className="object-contain"
-                    quality={100}
-                  />
+                
+                {selectedPost.imageUrl ? (
+                  <div className="relative w-full h-[70vh]">
+                    <Image
+                      src={selectedPost.imageUrl}
+                      alt="Expanded post image"
+                      fill
+                      className="object-contain"
+                      quality={100}
+                    />
+                  </div>
+                ) : (
+                  <div className="p-6 md:p-8">
+                    <DialogTitle className="text-lg font-medium text-white mb-4">
+                      {influencer.name}&apos;s Post
+                    </DialogTitle>
+                    {/* Fixed scrollable area with markdown support */}
+                    <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700 max-h-[60vh] overflow-y-auto">
+                      <div 
+                        className="text-gray-100 whitespace-pre-wrap"
+                        dangerouslySetInnerHTML={{ __html: parseMarkdown(selectedPost.content) }}
+                      />
+                    </div>
+                  </div>
+                )}
+                
+                <div className="p-4 md:p-6 border-t border-gray-800">
+                  <div className="text-sm text-gray-400">
+                    Posted on {new Date(selectedPost.createdAt).toLocaleDateString("en-US", {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </div>
                 </div>
               </DialogContent>
             </Dialog>

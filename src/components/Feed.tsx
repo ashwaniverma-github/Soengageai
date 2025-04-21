@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Post, AIInfluencer } from "@/types/types";
-import {  X } from "lucide-react";
+import { X, ChevronDown, ChevronUp } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useSession } from "next-auth/react";
@@ -22,8 +22,7 @@ export default function Feed() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-  
+  const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,6 +73,29 @@ export default function Feed() {
     } else {
       window.location.href = `/influencer/${influencerId}`;
     }
+  };
+
+  // Add handlers for expanding and collapsing posts
+  const toggleExpandedPost = (postId: string) => {
+    setExpandedPosts(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
+
+  // Format text with bold markers
+  const formatText = (text: string) => {
+    if (!text.includes('**')) return text;
+    
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    
+    return parts.map((part, idx) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        const boldText = part.slice(2, -2);
+        return <strong key={idx} className="font-bold">{boldText}</strong>;
+      }
+      return <span key={idx}>{part}</span>;
+    });
   };
 
   if (loading) {
@@ -264,42 +286,75 @@ export default function Feed() {
                     </div>
                   </div>
                 )}
-              <div className="space-y-3">
-                {/* Post content rendered with paragraph breaks and formatting */}
-                {post.content.split('\n').map((paragraph, index) => (
-                  <p key={index} className="text-zinc-300 leading-relaxed">
-                    {paragraph}
-                  </p>
-                ))}
-                
-                {/* Hashtags section if the post has any */}
-                {post.content.includes('#') && (
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {post.content
-                      .split(' ')
-                      .filter(word => word.startsWith('#'))
-                      .map((hashtag, index) => (
-                        <span 
-                          key={index} 
-                          className="text-purple-400 hover:text-purple-300 cursor-pointer text-sm"
-                        >
-                          {hashtag}
-                        </span>
-                      ))}
-                  </div>
-                )}
-                
-                {/* Read more toggle for longer posts */}
-                {post.content.length > 280 && (
-                  <button 
-                    className="text-purple-400 hover:text-purple-300 text-sm font-medium"
-                    onClick={() => {/* Toggle read more state */}}
-                  >
-                    Read more
-                  </button>
-                )}
-              </div>
-            </CardContent>
+                <div className="space-y-3">
+                  {/* Check if post content is long enough to need "read more" */}
+                  {(() => {
+                    const words = post.content.split(/\s+/);
+                    const isLongPost = words.length > 100;
+                    
+                    if (isLongPost && !expandedPosts[post.id]) {
+                      // Get first 100 words for preview
+                      const preview = words.slice(0, 100).join(' ');
+                      const paragraphs = preview.split('\n');
+                      
+                      return (
+                        <>
+                          {paragraphs.map((paragraph, index) => (
+                            <p key={index} className="text-zinc-300 leading-relaxed">
+                              {formatText(paragraph)}
+                              {index === paragraphs.length - 1 && '...'}
+                            </p>
+                          ))}
+                          <button 
+                            className="text-purple-400 hover:text-purple-300 text-sm font-medium flex items-center gap-1"
+                            onClick={() => toggleExpandedPost(post.id)}
+                          >
+                            Read more
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                        </>
+                      );
+                    } else {
+                      // Show full content or short post
+                      return (
+                        <>
+                          {post.content.split('\n').map((paragraph, index) => (
+                            <p key={index} className="text-zinc-300 leading-relaxed">
+                              {formatText(paragraph)}
+                            </p>
+                          ))}
+                          {isLongPost && expandedPosts[post.id] && (
+                            <button 
+                              className="text-purple-400 hover:text-purple-300 text-sm font-medium flex items-center gap-1"
+                              onClick={() => toggleExpandedPost(post.id)}
+                            >
+                              Show less
+                              <ChevronUp className="w-4 h-4" />
+                            </button>
+                          )}
+                        </>
+                      );
+                    }
+                  })()}
+                  
+                  {/* Hashtags section if the post has any */}
+                  {post.content.includes('#') && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {post.content
+                        .split(' ')
+                        .filter(word => word.startsWith('#'))
+                        .map((hashtag, index) => (
+                          <span 
+                            key={index} 
+                            className="text-purple-400 hover:text-purple-300 cursor-pointer text-sm"
+                          >
+                            {hashtag}
+                          </span>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
 
               {/* Post Footer */}
               <CardFooter className="p-4 border-t border-zinc-800">
